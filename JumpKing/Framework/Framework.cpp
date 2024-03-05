@@ -11,7 +11,7 @@ void Framework::Init(int width, int height, const std::string& name)
 
     window.create(sf::VideoMode(windowSize.x, windowSize.y), name);
 
-    DT_MGR.Init();
+    //DT_MGR.Init();
     InputMgr::Init();
     SOUND_MGR.Init();
     SCENE_MGR.Init();

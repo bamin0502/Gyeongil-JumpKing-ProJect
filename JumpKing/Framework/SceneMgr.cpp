@@ -14,8 +14,8 @@ SceneMgr::~SceneMgr()
 void SceneMgr::Init()
 {
 	Release();
-	scenes.push_back(new TitleScene(SceneIds::TitleScene));
-	scenes.push_back(new GameScene(SceneIds::GameScene));
+	scenes.push_back(new TitleScene(SceneIds::Title));
+	scenes.push_back(new GameScene(SceneIds::Game));
 	scenes.push_back(new SceneDev1(SceneIds::SceneDev1));
 	scenes.push_back(new SceneDev2(SceneIds::SceneDev2));
 

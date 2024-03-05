@@ -31,4 +31,3 @@
 #include "GameObject.h"
 #include "DataTableMgr.h"
 #include "StringTable.h"
-#include "ZombieTable.h"

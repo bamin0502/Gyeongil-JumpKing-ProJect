@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Scene.h"
 
 class GameScene:public Scene
 {
@@ -8,6 +9,11 @@ public:
     GameScene(SceneIds id);
     ~GameScene() override;
 
+    GameScene(const GameScene&) = delete;
+    GameScene(GameScene&&) = delete;
+    GameScene& operator=(const GameScene&) = delete;
+    GameScene& operator=(GameScene&&) = delete;
+    
     void Init() override;
     void Release() override;
     void Enter() override;

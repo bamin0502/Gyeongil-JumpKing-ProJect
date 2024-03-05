@@ -1,23 +1,26 @@
 ﻿#include "pch.h"
 #include "TitleScene.h"
+#include "SpriteGo.h"
+
 
 TitleScene::TitleScene(SceneIds id):Scene(id)
 {
 }
 
-TitleScene::~TitleScene()
-{
-}
-
 void TitleScene::Init()
 {
-    title = new SpriteGo("title");
-    title->SetTexture("graphics/Title.png");
-
-    title->SetOrigin(Origins::MC);
-    AddGo(title,Ui);
-    
     Scene::Init();
+
+    backgroundImage = new SpriteGo("TitleBackground");
+    backgroundImage->SetTexture("graphics/title.png");
+    backgroundImage->SetOrigin(Origins::MC);
+    AddGo(backgroundImage);
+    
+    
+    for (GameObject* obj : gameObjects)
+    {
+        obj->Init();
+    }
 }
 
 void TitleScene::Release()
@@ -40,9 +43,9 @@ void TitleScene::Update(float dt)
 {
     Scene::Update(dt);
 
-    if(InputMgr::GetKeyDown(sf::Keyboard::Space))
+    if(InputMgr::GetKeyDown(sf::Keyboard::Enter))
     {
-        SceneMgr::Instance().ChangeScene(SceneIds::GameScene);
+        SceneMgr::Instance().ChangeScene(SceneIds::Game);
     }
 }
 
