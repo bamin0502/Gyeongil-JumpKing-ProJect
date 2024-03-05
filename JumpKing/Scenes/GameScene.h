@@ -5,8 +5,8 @@ class GameScene:public Scene
 protected:
     
 public:
-    GameScene();
-    ~GameScene();
+    GameScene(SceneIds id);
+    ~GameScene() override;
 
     void Init() override;
     void Release() override;
