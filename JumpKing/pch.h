@@ -10,6 +10,9 @@
 #include <vector>
 #include <list>
 #include <unordered_map>
+#include <queue>
+#include <string>
+#include <functional>
 
 // SFML
 #include <SFML/Graphics.hpp>
@@ -20,6 +23,7 @@
 #include "Framework.h"
 #include "InputMgr.h"
 #include "ResourceMgr.h"
+#include "Animator.h"
 #include "SceneMgr.h"
 #include "SoundMgr.h"
 #include "Scene.h"

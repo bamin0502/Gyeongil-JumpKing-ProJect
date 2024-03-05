@@ -88,10 +88,12 @@ void InputMgr::Update(float dt)
         axisInfo.value += speed * axisInfo.sensi * dt;
         axisInfo.value = Utils::Clamp(axisInfo.value, -1.f, 1.f);
 
-        if (raw == 0.f && abs(axisInfo.value) < speed * axisInfo.sensi * dt)
+        bool over =(speed > 0 ) ? (axisInfo.value > 0.f) : (axisInfo.value < 0.f);
+        if (raw == 0.f && over)
         {
             axisInfo.value = 0.f;
         }
+
     }
 }
 
@@ -136,20 +138,6 @@ float InputMgr::GetAxis(Axis axis)
 
 bool InputMgr::GetKeyDown(sf::Keyboard::Key key)
 {
-    /*std::list<sf::Keyboard::Key>::iterator it = downList.begin();
-
-    for (auto it = downList.begin(); it != downList.end(); ++it)
-    {
-        if (*it == key)
-            return true;
-    }
-
-    for (auto k : downList)
-    {
-        if (k == key)
-            return true;
-    }*/
-
     return std::find(downList.begin(), downList.end(), key) != downList.end();
 }
 
