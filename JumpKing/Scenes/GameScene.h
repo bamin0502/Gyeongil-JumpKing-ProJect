@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include "Scene.h"
+#include "TextGo.h"
 
 class GameScene:public Scene
 {
 protected:
-    
+    std::wstring str= L"\t\t\t\t전설에 따르면\n정상에 정말 끝내주는 아가씨가 있다고 하는데...";
+    TextGo* introText;
 public:
     GameScene(SceneIds id);
     ~GameScene() override;

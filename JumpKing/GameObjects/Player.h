@@ -1,8 +1,22 @@
 ﻿#pragma once
 #include "SpriteGo.h"
+#include "Animator.h"
 
 class Player:public SpriteGo
 {
+    struct ClipInfo
+    {
+        std::string idle;
+        std::string move;
+        bool filpX=false;
+        sf::Vector2f point;
+        ClipInfo()
+        {
+            
+        }
+        ClipInfo(const std::string& idle, const std::string& move, bool flipX, const sf::Vector2f& point)
+            :idle(idle), move(move), filpX(flipX), point(point) {}
+    };
 protected:
     Animator animator;
 
@@ -18,7 +32,7 @@ protected:
     bool isJumping=false;
     
 public:
-    Player();
+    Player(const std::string& name = "");
     ~Player() override;
 
     void Init() override;

@@ -1,0 +1,9 @@
+ID,FPS,"LOOPTYPE (0:Single , 1:Loop , 2:PingPong)",,
+Idle,10,1,,
+,,,,
+TEXTURE ID,LEFT,TOP,WIDTH,HEIGHT
+graphics/player_sheet.png,0,0,32,32
+graphics/player_sheet.png,0,0,64,32
+graphics/player_sheet.png,0,0,96,32
+graphics/player_sheet.png,0,0,128,32
+graphics/player_sheet.png,0,0,160,32

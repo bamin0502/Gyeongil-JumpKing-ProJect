@@ -23,6 +23,8 @@ void GameObject::SetScale(const sf::Vector2f& scale)
 	this->scale = scale;
 }
 
+
+
 void GameObject::Init()
 {
 	

@@ -2,13 +2,19 @@
 #include "Scene.h"
 
 class SpriteGo;
+class TextGo;
 
 class TitleScene:public Scene
 {
 protected:
-    SpriteGo* backgroundImage;
-    //TextGo* pressStart;
-    
+    SpriteGo* TitleImage;
+    TextGo* pressStart;
+    std::wstring str= L"Space 버튼을 누르세요";
+    sf::Font font;
+    float fadeInElapsedTime;
+    float fadeInDuration;
+
+    bool isFadingIn=false;
 public:
     TitleScene(SceneIds id);
     ~TitleScene() override=default;

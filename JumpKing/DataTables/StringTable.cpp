@@ -17,6 +17,7 @@ bool StringTable::Load(Languages languages)
     currLang=languages;
 
     table.clear();
+    //이거때문에 안열리는 거였다 주석으로 일단 가리고 기억하자
     //rapidcsv::Document doc(filePathArray[static_cast<int>(languages)],rapidcsv::LabelParams(0, -1));
     
     /*for(int i=0; i<doc.GetRowCount(); i++)
