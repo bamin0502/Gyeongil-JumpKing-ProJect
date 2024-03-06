@@ -31,8 +31,6 @@ sf::Vector2i Scene::UiToScreen(sf::Vector2f uiPos)
 
 void Scene::Init()
 {
-
-	
 	for (auto obj : gameObjects)
 	{
 		obj->Init();

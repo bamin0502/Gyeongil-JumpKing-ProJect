@@ -10,7 +10,6 @@ protected:
     SpriteGo* TitleImage;
     TextGo* pressStart;
     std::wstring str= L"Space 버튼을 누르세요";
-    sf::Font font;
     float fadeInElapsedTime;
     float fadeInDuration;
 

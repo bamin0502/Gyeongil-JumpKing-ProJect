@@ -11,7 +11,6 @@ TitleScene::TitleScene(SceneIds id):Scene(id)
 void TitleScene::Init()
 {
     Scene::Init();
-    font.loadFromFile("fonts/Galmuri11-Bold.ttf");
     
     TitleImage = new SpriteGo("TitleImage");
     TitleImage->SetTexture("graphics/title.png");
