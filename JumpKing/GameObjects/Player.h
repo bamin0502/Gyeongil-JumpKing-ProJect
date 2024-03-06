@@ -8,19 +8,21 @@ class Player:public SpriteGo
     {
         std::string idle;
         std::string move;
+        std::string jump;
         bool filpX=false;
         sf::Vector2f point;
         ClipInfo()
         {
             
         }
-        ClipInfo(const std::string& idle, const std::string& move, bool flipX, const sf::Vector2f& point)
-            :idle(idle), move(move), filpX(flipX), point(point) {}
+        ClipInfo(const std::string& idle, const std::string& move,const std::string& jump, bool flipX, const sf::Vector2f& point)
+            :idle(idle), move(move), jump(jump),filpX(flipX), point(point) {}
+        
     };
 protected:
     Animator animator;
 
-    float moveSpeed=100.f;
+    float moveSpeed=300.f;
     sf::Vector2f velocity;
     bool isGrounded=true;
 
@@ -28,7 +30,8 @@ protected:
     
     float jumpTime=0.6f;
     float jumpPower=300.f;
-    int jumpStep=35;
+    float jumpGuage;
+    float jumpStep=35.f;
     bool isJumping=false;
     
 public:

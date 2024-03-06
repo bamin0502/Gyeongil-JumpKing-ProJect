@@ -22,8 +22,9 @@ void GameScene::Init()
     introText->SetScale({1.5f, 1.5f});
     introText->SetOrigin(Origins::MC);
     introText->SetPosition({0.f, 0.f});
-    
     AddGo(introText);
+
+
 
     for (GameObject* obj : gameObjects)
     {
@@ -39,6 +40,7 @@ void GameScene::Release()
 void GameScene::Enter()
 {
     Scene::Enter();
+    
     introText->SetAlpha(255);
     fadeoutElapsedTime=0.f;
     fadeoutDuration=3.0f;

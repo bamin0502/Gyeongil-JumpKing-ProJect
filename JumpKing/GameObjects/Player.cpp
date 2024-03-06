@@ -15,9 +15,6 @@ void Player::Init()
     SpriteGo::Init();
     
     animator.SetTarget(&sprite);
-    
-
-    
 }
 
 void Player::Release()
@@ -31,7 +28,7 @@ void Player::Reset()
 
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
-    SetPosition({0.f,0.f});
+    
     
 }
 
@@ -49,7 +46,7 @@ void Player::Update(float dt)
     {
         isGrounded = false;
         //뒤에 애니메이션 추가 예정
-        //animator.Play("animations/Jump.csv");
+        animator.Play("animations/player_Jump.csv");
         velocity.y = -sqrtf(2.f * gravity * 100);
     }
     velocity.y+=gravity*dt;
@@ -58,8 +55,37 @@ void Player::Update(float dt)
     if(position.y>0.f)
     {
         isGrounded=true;
-
         position.y=0.f;
+    }
+    if (h != 0.f)
+    {
+        SetFlipX(h < 0);
+    }
+
+    if (animator.GetCurrentClipId() == "animations/player_Idle.csv")
+    {
+        if (h != 0)
+        {
+            animator.Play("animations/player_Move.csv");
+        }
+    }
+    else if (animator.GetCurrentClipId() == "animations/player_Move.csv")
+    {
+        if (h == 0)
+        {
+            animator.Play("animations/player_Idle.csv");
+        }
+    }
+    else if (animator.GetCurrentClipId() == "animations/player_Jump.csv" && isGrounded)
+    {
+        if (h == 0)
+        {
+            animator.Play("animations/player_Idle.csv");
+        }
+        else
+        {
+            animator.Play("animations/player_Move.csv");
+        }
     }
     SetPosition(position);
 }
@@ -76,7 +102,7 @@ void Player::FixedUpdate(float dt)
 
 void Player::Draw(sf::RenderWindow& window)
 {
-    SpriteGo::Draw(window);
+    //SpriteGo::Draw(window);
     window.draw(sprite);
 }
 

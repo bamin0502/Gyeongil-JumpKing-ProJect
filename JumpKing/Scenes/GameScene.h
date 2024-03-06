@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "TextGo.h"
 
+class Map;
+
 class GameScene:public Scene
 {
 protected:
@@ -9,8 +11,10 @@ protected:
     TextGo* introText;
     float fadeoutElapsedTime;
     float fadeoutDuration;
-
     bool isFadingOut=false;
+    Map* map;
+    
+
 public:
     GameScene(SceneIds id);
     ~GameScene() override;
