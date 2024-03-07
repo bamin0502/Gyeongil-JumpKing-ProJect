@@ -28,7 +28,7 @@ struct AnimationClip
     std::string id;
     std::vector<AnimationFrame> frames;
     AnimationLoopTypes LoopType=AnimationLoopTypes::Single;
-    int fps=30;
+    int fps=5;
 
     int GetTotalFrame() const
     {
@@ -50,9 +50,10 @@ struct AnimationEvent
 class Animator
 {
 protected:
-    
+    std::unordered_map<std::string, AnimationClip> clips;
     std::queue<std::string> queue;
     std::list<AnimationEvent> eventList;
+
     float speed =1.f;
 
     bool isPlaying = false;
@@ -64,8 +65,6 @@ protected:
     float accumTime=0.f;
     
     sf::Sprite* target=nullptr;
-
-    
 public:
     Animator();
     virtual ~Animator();
@@ -89,6 +88,7 @@ public:
 
     void Update(float dt);
 
+    void PlayIndex(const std::string& clipId, int index);
     void Play(const std::string& clipId,bool clearQueue=true);
     void PlayQueue(const std::string& clipId);
     void Stop();

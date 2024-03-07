@@ -1,7 +1,11 @@
 ﻿#include "pch.h"
 #include "GameScene.h"
+
+#include "Map.h"
 #include "rapidcsv.h"
 #include "Player.h"
+
+
 
 GameScene::GameScene(SceneIds id):Scene(id)
 {
@@ -14,7 +18,15 @@ GameScene::~GameScene()
 void GameScene::Init()
 {
     Scene::Init();
-    AddGo(new Player());
+    FRAMEWORK.SetTimeScale(1.f);
+    FRAMEWORK.GetWindow().setSize({1920, 1080}); // FHD 기준
+    FRAMEWORK.GetWindow().setView(worldView);
+    
+    background = new SpriteGo("background");
+    background->SetTexture("graphics/map1.png");
+    background->SetOrigin(Origins::MC);
+    background->SetPosition({0.f, -1250.f});
+    AddGo(background);
     
     introText = new TextGo("intro");
     introText->SetFont("fonts/Galmuri11-Bold.ttf");
@@ -23,13 +35,19 @@ void GameScene::Init()
     introText->SetOrigin(Origins::MC);
     introText->SetPosition({0.f, 0.f});
     AddGo(introText);
+    
+    player = new Player("player");
+    AddGo(player);
 
+    Map* map = new Map;
+    AddGo(map);
 
-
+    
     for (GameObject* obj : gameObjects)
     {
         obj->Init();
     }
+    
 }
 
 void GameScene::Release()
@@ -40,12 +58,18 @@ void GameScene::Release()
 void GameScene::Enter()
 {
     Scene::Enter();
+    worldView.setCenter({ 0.f, 0.f});
+    //player->SetPosition({mapTile->GetPosition().x, mapTile->GetPosition().y-100.f});
+    // sf::Vector2f windowSize = (sf::Vector2f)FRAMEWORK.GetWindowSize();
+    //
+    // worldView.setSize(windowSize);
+    // worldView.setCenter({ 0.f, 0.f });
     
     introText->SetAlpha(255);
     fadeoutElapsedTime=0.f;
     fadeoutDuration=3.0f;
     isFadingOut=true;
-    
+    player->Reset();
 }
 
 void GameScene::Exit()
@@ -56,7 +80,7 @@ void GameScene::Exit()
 void GameScene::Update(float dt)
 {
     Scene::Update(dt);
-
+    //background->SetPosition(player->GetPosition());
     //페이드아웃 만들기
     if(isFadingOut)
     {
@@ -91,5 +115,6 @@ void GameScene::FixedUpdate(float dt)
 void GameScene::Draw(sf::RenderWindow& window)
 {
     Scene::Draw(window);
+    
     
 }

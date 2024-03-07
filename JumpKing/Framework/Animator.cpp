@@ -105,6 +105,25 @@ void Animator::Update(float dt)
     SetFrame(currentClip->frames[currentFrame]);
 }
 
+void Animator::PlayIndex(const std::string& clipId, int index)
+{
+    if(!clips.count(clipId))
+    {
+        return;
+    }
+    AnimationClip& clip = clips[clipId];
+    if(index < 0 || index >= clip.frames.size())
+    {
+        return;
+    }
+    SetFrame(clip.frames[index]);
+    currentFrame = index;
+    totalFrame = clip.frames.size();
+    currentClip = &clip;
+    isPlaying = true;
+}
+
+
 void Animator::Play(const std::string& clipId,bool clearQueue)
 {
     if(clearQueue)

@@ -1,8 +1,10 @@
 ﻿#include "pch.h"
 #include "Player.h"
 
+#include "GameScene.h"
+
 Player::Player(const std::string& name)
-    : SpriteGo(name)
+    : SpriteGo(name),jumpDirection(0.f)
 {
 }
 
@@ -15,6 +17,8 @@ void Player::Init()
     SpriteGo::Init();
     
     animator.SetTarget(&sprite);
+    
+    sprite.setPosition({ 0.f, -1200.f });
 }
 
 void Player::Release()
@@ -28,8 +32,6 @@ void Player::Reset()
 
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
-    
-    
 }
 
 void Player::Update(float dt)
@@ -37,54 +39,93 @@ void Player::Update(float dt)
     SpriteGo::Update(dt);
 
     animator.Update(dt);
-    //이동 관련 코드 
-    float h=InputMgr::GetAxis(Axis::Horizontal);
-    velocity.x=moveSpeed*h;
+
+    auto prevVel = velocity;
     
-    //점프 관련 코드 0.6초동안 35단계로 점프력을 결정 일단은 보류
-    if(isGrounded && InputMgr::GetKeyDown(sf::Keyboard::Space))
+    if (isJumpCharging)
     {
-        isGrounded = false;
-        //뒤에 애니메이션 추가 예정
-        animator.Play("animations/player_Jump.csv");
-        velocity.y = -sqrtf(2.f * gravity * 100);
-    }
-    velocity.y+=gravity*dt;
-
-    position+=velocity*dt;
-    if(position.y>0.f)
-    {
-        isGrounded=true;
-        position.y=0.f;
-    }
-    if (h != 0.f)
-    {
-        SetFlipX(h < 0);
-    }
-
-    if (animator.GetCurrentClipId() == "animations/player_Idle.csv")
-    {
-        if (h != 0)
+        if (InputMgr::GetKeyUp(sf::Keyboard::Space))
         {
-            animator.Play("animations/player_Move.csv");
+            isJumping = true;
+            isJumpCharging = false;
+            float chargeTime = timer.getElapsedTime().asSeconds() - jumpStartTime;
+            float jumpPower = 35.f * (chargeTime / maxjumpTime);
+            velocity.y = -sqrt(2 * gravity * jumpPower);
+            float jumpDirection = 0.f;
+            if (InputMgr::GetKey(sf::Keyboard::Left))
+            {
+                jumpDirection -= 1.f;
+            }
+            if (InputMgr::GetKey(sf::Keyboard::Right))
+            {
+                jumpDirection += 1.f;
+            }
+            velocity.x = jumpDirection * moveSpeed * (chargeTime / maxjumpTime);
+            animator.Play("animations/player_JumpUp.csv");
         }
     }
-    else if (animator.GetCurrentClipId() == "animations/player_Move.csv")
+    else if (isJumping)
     {
-        if (h == 0)
+        velocity.y += gravity * dt;
+        if (prevVel.y > 0 && velocity.y < 0)
+        {
+            animator.Play("animations/player_JumpDown.csv");
+        }
+        if(!animator.IsPlaying())
         {
             animator.Play("animations/player_Idle.csv");
         }
     }
-    else if (animator.GetCurrentClipId() == "animations/player_Jump.csv" && isGrounded)
+    else if (isGrounded)
     {
-        if (h == 0)
+        if (InputMgr::GetKeyDown(sf::Keyboard::Space))
         {
-            animator.Play("animations/player_Idle.csv");
+            isGrounded = false;
+            isJumpCharging = true;
+            jumpStartTime = timer.getElapsedTime().asSeconds();
+            animator.Play("animations/player_Jump.csv");
         }
-        else
+    }
+    
+    position += velocity * dt;
+    if (position.y > 0)
+    {
+        velocity.y = 0;
+        isGrounded = true;
+
+        isJumping = false;
+        isJumpCharging = false;
+        animator.Play("animations/player_Idle.csv");
+    }
+    // 이동 애니메이션 설정
+    if (!isJumpCharging && !isJumping) {
+        float h = 0.f;
+        if (InputMgr::GetKey(sf::Keyboard::Left))
         {
-            animator.Play("animations/player_Move.csv");
+            h -= 1.f;
+        }
+        if (InputMgr::GetKey(sf::Keyboard::Right))
+        {
+            h += 1.f;
+        }
+        velocity.x = h * moveSpeed;
+        if (h != 0.f)
+        {
+            SetFlipX(h < 0);
+        }
+        if (animator.GetCurrentClipId() == "animations/player_Idle.csv")
+        {
+            if (h != 0)
+            {
+                animator.Play("animations/player_Move.csv");
+            }
+        }
+        else if (animator.GetCurrentClipId() == "animations/player_Move.csv")
+        {
+            if (h == 0)
+            {
+                animator.Play("animations/player_Idle.csv");
+            }
         }
     }
     SetPosition(position);
@@ -104,16 +145,6 @@ void Player::Draw(sf::RenderWindow& window)
 {
     //SpriteGo::Draw(window);
     window.draw(sprite);
-}
-
-void Player::Jump()
-{
-    
-}
-
-void Player::Move(float dt)
-{
-    
 }
 
 void Player::CheckCollision()

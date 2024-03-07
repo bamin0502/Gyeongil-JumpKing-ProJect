@@ -17,6 +17,7 @@
 // SFML
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <SFML/System/Clock.hpp>
 
 #include "Defines.h"
 #include "Utils.h"

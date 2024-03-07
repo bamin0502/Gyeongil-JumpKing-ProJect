@@ -151,6 +151,7 @@ bool InputMgr::GetKey(sf::Keyboard::Key key)
     return std::find(ingList.begin(), ingList.end(), key) != ingList.end();
 }
 
+
 bool InputMgr::GetMouseButtonDown(sf::Mouse::Button button)
 {
     return std::find(downList.begin(), downList.end(), MouseButtonToKey(button)) != downList.end();
