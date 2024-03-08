@@ -25,6 +25,8 @@ void GameScene::Init()
     background->SetOrigin(Origins::MC);
     background->SetPosition({0.f, -700.f});
     AddGo(background,Layers::World);
+    //Map* map = new Map;
+    //AddGo(map,Layers::World);
     player = new Player("player");
     AddGo(player,Layers::World);
     introText = new TextGo("intro");
@@ -37,8 +39,7 @@ void GameScene::Init()
     
 
 
-    Map* map = new Map;
-    AddGo(map);
+
 
     
     for (GameObject* obj : gameObjects)

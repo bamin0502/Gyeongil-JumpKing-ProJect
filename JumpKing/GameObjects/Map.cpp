@@ -35,19 +35,19 @@ void Map::Init()
 
     foreground1 = new SpriteGo("map1");
     foreground1->SetTexture("graphics/map1.png");
-    foreground1->SetPosition({0.f, 0.f});
+    foreground1->SetPosition({0.f, -700.f});
     foreground1->SetOrigin(Origins::MC);
     
 
     foreground2 = new SpriteGo("map2");
     foreground2->SetTexture("graphics/map2.png");
-    foreground2->SetPosition({0.f, 2500.f});
+    foreground2->SetPosition({0.f, 1800.f});
     foreground2->SetOrigin(Origins::MC);
     
 
     foreground3 = new SpriteGo("map3");
     foreground3->SetTexture("graphics/map3.png");
-    foreground3->SetPosition({0.f, 5000.f});
+    foreground3->SetPosition({0.f, 4300.f});
     foreground3->SetOrigin(Origins::MC);
    
     
@@ -103,6 +103,5 @@ void Map::SetRotation(float r)
 void Map::Draw(sf::RenderWindow& window)
 {
     GameObject::Draw(window);
-    
     
 }

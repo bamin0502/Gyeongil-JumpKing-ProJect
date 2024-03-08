@@ -51,6 +51,7 @@ protected:
     bool isJumping=false;
     int currentJumpStage;
     float currentHeight;
+    float maxJumpHeight = 380.0f;
     sf::Clock timer;
     GameScene* gameScene;
     JumpPhase jumpPhase;

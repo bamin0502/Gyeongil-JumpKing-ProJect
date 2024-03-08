@@ -14,12 +14,12 @@ protected:
         //background3=RES_MGR_TEXTURE.Get("graphics/map3_backGround.png")
     };
     //그 위에 충돌할 이미지를 가릴 이미지
-    // std::vector<SpriteGo> foreground=
-    // {
-    //     *foreground1=SpriteGo("graphics/map1.png"),
-    //     *foreground2=SpriteGo("graphics/map2.png"),
-    //     *foreground3=SpriteGo("graphics/map3.png")
-    // };
+     std::vector<SpriteGo> foreground=
+     {
+         *foreground1=SpriteGo("graphics/map1.png"),
+         *foreground2=SpriteGo("graphics/map2.png"),
+         *foreground3=SpriteGo("graphics/map3.png")
+     };
 
     sf::Texture background1;
     SpriteGo* foreground1;

@@ -2,8 +2,6 @@
 #include "Player.h"
 #include "GameScene.h"
 
-
-
 Player::Player(const std::string& name)
     : SpriteGo(name), jumpDirection(0.f), jumpPhase(JumpPhase::Grounded) {
 }
@@ -18,7 +16,7 @@ void Player::Release() {
 void Player::Reset() {
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
-    SetPosition({0.f, 500.f});
+    SetPosition({0.f, 510.f});
     jumpPhase = JumpPhase::Grounded;
 }
 
@@ -26,6 +24,13 @@ void Player::Update(float dt) {
     SpriteGo::Update(dt);
     animator.Update(dt);
     HandleInput();
+    // 차징 시간이 1초를 초과했는지 확인하고, 조건을 충족하면 자동으로 점프 실행
+    if (isJumpCharging) {
+        float chargingTime = timer.getElapsedTime().asSeconds() - jumpStartTime;
+        if (chargingTime > 1.0f) { 
+            PerformJump(); // 자동 점프 실행
+        }
+    }
     UpdateMovement(dt);
     UpdateAnimation();
     
@@ -101,8 +106,6 @@ void Player::UpdateAnimation() {
             } else {
                 animator.Play("animations/player_Move.csv");
             }
-            //나중에 추락 관련 처리
-            //if()
             break;
     }
 }
@@ -114,24 +117,23 @@ void Player::StartJumpCharging() {
 }
 
 void Player::PerformJump() {
-    // 차징 상태 해제
+    // 차징 상태 해제 및 점프 상태 설정
     isJumpCharging = false;
-    // 점프 상태 설정
     isJumping = true;
     jumpPhase = JumpPhase::Rising;
 
     float chargeDuration = timer.getElapsedTime().asSeconds() - jumpStartTime;
-    if (chargeDuration < 0.2f) {
-        // 짧게 눌렀을 경우의 처리
-        velocity.x = jumpDirection * moveSpeed;
-        velocity.y = -sqrt(gravity * jumpHeightFactor * 0.2f);
-    } else {
-        // 일반적인 점프 처리
-        velocity.y = -sqrt(8*gravity * jumpHeightFactor * chargeDuration);
-        velocity.x = jumpDirection * moveSpeed * 0.5;
+    float jumpHeight = sqrt(8 * gravity * jumpHeightFactor * chargeDuration); // 계산된 점프 높이
+
+    // 최대 점프 높이를 초과하지 않도록 조정
+    if (jumpHeight > maxJumpHeight) {
+        jumpHeight = maxJumpHeight;
     }
 
-    // 점프 후 방향에 따른 스프라이트 반전 설정
+    velocity.y = -jumpHeight; // Y축 속도에 점프 높이 적용
+    velocity.x = jumpDirection * moveSpeed * 0.5;
+
+    // 스프라이트 반전 설정
     sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f);
 }
 
