@@ -59,10 +59,13 @@ void Player::HandleInput() {
         sprite.setScale(1.f, 1.f);
     }
 
-    if (InputMgr::GetKeyDown(sf::Keyboard::Space) && isGrounded) {
+    
+    if (InputMgr::GetKeyDown(sf::Keyboard::Space) && isGrounded && !isJumping) {
         StartJumpCharging();
     }
-    if (InputMgr::GetKeyUp(sf::Keyboard::Space) && isJumpCharging) {
+
+    
+    if (InputMgr::GetKeyUp(sf::Keyboard::Space) && isJumpCharging && !isJumping) {
         PerformJump();
     }
 }
@@ -77,6 +80,8 @@ void Player::UpdateMovement(float dt) {
                 position.y = groundYPosition;
                 velocity.y = 0;
                 jumpPhase = JumpPhase::Grounded;
+                isJumping = false;
+                isGrounded = true;
             }
             break;
         case JumpPhase::Grounded:
@@ -155,7 +160,9 @@ bool Player::CheckCollision(const sf::Image& image) {
             }
             if(image.getPixel(pixelPosition.x,pixelPosition.y)==obstacleColor)
             {
+                std::cout<<"Collision detected"<<std::endl;
                 return true;
+                
             }
         }
     }
