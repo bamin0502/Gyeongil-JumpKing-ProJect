@@ -26,8 +26,6 @@ void GameScene::Init()
     background->SetPosition({0.f, -700.f});
     AddGo(background,Layers::World);
     player = new Player("player");
-    player->SetOrigin(Origins::MC);
-    player->SetPosition({0.f, 500.f});
     AddGo(player,Layers::World);
     introText = new TextGo("intro");
     introText->SetFont("fonts/Galmuri11-Bold.ttf");
@@ -108,6 +106,7 @@ void GameScene::Update(float dt)
     }
     
     worldView.setCenter(960.f, viewCenterY);
+    worldView.zoom(2.f);
     //페이드아웃 만들기
     if(isFadingOut)
     {

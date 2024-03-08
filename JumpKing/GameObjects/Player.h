@@ -40,13 +40,14 @@ protected:
     bool isGrounded=true;
     bool isFalling=false;
     bool isJumpCharging=false;
-    float gravity=100.f;
+    float gravity=300.f;
 
+    float jumpHeightFactor=100.f;
     float jumpHeight;
     float jumpDirection;
     float jumpStartTime=0;
     float jumpTime=0.f;
-    float jumpPower=300.f;
+    float jumpPower=1000.f;
     float jumpGuage;
     float maxjumpTime=0.6f;
     float jumpStep=35.f;
@@ -56,7 +57,7 @@ protected:
     sf::Clock timer;
     GameScene* gameScene;
 
-    
+    float groundYPosition=510.f;
 public:
     Player(const std::string& name = "");
 
@@ -68,6 +69,12 @@ public:
     void FixedUpdate(float dt) override;
     void Draw(sf::RenderWindow& window) override;
 
+    void HandleInput(float dt);
+    void UpdateMovement(float dt);
+    void UpdateAnimation();
+    void StartJumpCharging();
+    void PerformJump();
+    
     void CheckCollision();
     
 };

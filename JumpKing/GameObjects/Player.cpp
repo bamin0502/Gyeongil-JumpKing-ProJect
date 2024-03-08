@@ -12,7 +12,6 @@ Player::Player(const std::string& name)
 
 void Player::Init()
 {
-    
     animator.SetTarget(&sprite);
 }
 
@@ -25,6 +24,7 @@ void Player::Reset()
 {
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
+    SetPosition({0.f, 500.f});
 }
 
 void Player::Update(float dt)
@@ -33,94 +33,10 @@ void Player::Update(float dt)
 
     animator.Update(dt);
 
-    auto prevVel = velocity;
-    
-    if (isJumpCharging)
-    {
-        if (InputMgr::GetKeyUp(sf::Keyboard::Space))
-        {
-            isJumping = true;
-            isJumpCharging = false;
-            float chargeTime = timer.getElapsedTime().asSeconds() - jumpStartTime;
-            float jumpPower = 35.f * (chargeTime / maxjumpTime);
-            velocity.y = -sqrt(2 * gravity * jumpPower);
-            float jumpDirection = 0.f;
-            if (InputMgr::GetKey(sf::Keyboard::Left))
-            {
-                jumpDirection -= 1.f;
-            }
-            if (InputMgr::GetKey(sf::Keyboard::Right))
-            {
-                jumpDirection += 1.f;
-            }
-            velocity.x = jumpDirection * moveSpeed * (chargeTime / maxjumpTime);
-            animator.Play("animations/player_JumpUp.csv");
-        }
-    }
-    else if (isJumping)
-    {
-        velocity.y += gravity * dt;
-        if (prevVel.y > 0 && velocity.y < 0)
-        {
-            animator.Play("animations/player_JumpDown.csv");
-        }
-        if(!animator.IsPlaying())
-        {
-            animator.Play("animations/player_Idle.csv");
-        }
-    }
-    else if (isGrounded)
-    {
-        if (InputMgr::GetKeyDown(sf::Keyboard::Space))
-        {
-            isGrounded = false;
-            isJumpCharging = true;
-            jumpStartTime = timer.getElapsedTime().asSeconds();
-            animator.Play("animations/player_Jump.csv");
-        }
-    }
-    
-    position += velocity * dt;
-    if (position.y > 0)
-    {
-        velocity.y = 0;
-        isGrounded = true;
+    HandleInput(dt);
+    UpdateMovement(dt);
+    UpdateAnimation();
 
-        isJumping = false;
-        isJumpCharging = false;
-        animator.Play("animations/player_Idle.csv");
-    }
-    // 이동 애니메이션 설정
-    if (!isJumpCharging && !isJumping) {
-        float h = 0.f;
-        if (InputMgr::GetKey(sf::Keyboard::Left))
-        {
-            h -= 1.f;
-        }
-        if (InputMgr::GetKey(sf::Keyboard::Right))
-        {
-            h += 1.f;
-        }
-        velocity.x = h * moveSpeed;
-        if (h != 0.f)
-        {
-            SetFlipX(h < 0);
-        }
-        if (animator.GetCurrentClipId() == "animations/player_Idle.csv")
-        {
-            if (h != 0)
-            {
-                animator.Play("animations/player_Move.csv");
-            }
-        }
-        else if (animator.GetCurrentClipId() == "animations/player_Move.csv")
-        {
-            if (h == 0)
-            {
-                animator.Play("animations/player_Idle.csv");
-            }
-        }
-    }
     SetPosition(position);
 }
 
@@ -138,6 +54,111 @@ void Player::Draw(sf::RenderWindow& window)
 {
     //SpriteGo::Draw(window);
     window.draw(sprite);
+}
+
+void Player::HandleInput(float dt)
+{
+    if (isGrounded && !isJumpCharging) {
+        jumpDirection = 0.f;
+        if (InputMgr::GetKey(sf::Keyboard::Left)) {
+            jumpDirection -= 1.f;
+            sprite.setScale(-1.f, 1.f); // 왼쪽으로 이동 시 스프라이트 반전
+        }
+        if (InputMgr::GetKey(sf::Keyboard::Right)) {
+            jumpDirection += 1.f;
+            sprite.setScale(1.f, 1.f); // 오른쪽으로 이동 시 스프라이트 정방향
+        }
+        
+        // 움직이는 중에는 차징을 시작할 수 없도록 함
+        if ((jumpDirection == 0.f) && InputMgr::GetKeyDown(sf::Keyboard::Space)) {
+            StartJumpCharging();
+        }
+    }
+
+    // 차징 중 방향키 입력을 기반으로 점프 방향 설정
+    if (isJumpCharging && InputMgr::GetKeyUp(sf::Keyboard::Space)) {
+        if (InputMgr::GetKey(sf::Keyboard::Left)) {
+            jumpDirection = -1;
+        } else if (InputMgr::GetKey(sf::Keyboard::Right)) {
+            jumpDirection = 1;
+        }
+        PerformJump();
+    }
+}
+
+void Player::UpdateMovement(float dt)
+{
+    if (isJumping || isJumpCharging) {
+        velocity.y += gravity * dt;
+        position += velocity * dt;
+
+        // 점프가 끝났을 때, 이동 및 점프 관련 변수 초기화
+        if (position.y > groundYPosition) {
+            position.y = groundYPosition;
+            velocity.y = 0;
+            isJumping = false;
+            isGrounded = true;
+            jumpDirection = 0; // 추가된 부분: 점프 후 방향 초기화
+        }
+    } else {
+        // 차징 중이 아니면 이동 가능
+        if (!isJumpCharging) {
+            velocity.x = jumpDirection * moveSpeed;
+            position += velocity * dt;
+        }
+    }
+}
+
+void Player::UpdateAnimation()
+{
+    // 점프 차징 중일 때의 애니메이션
+    if (isJumpCharging) {
+        if (animator.GetCurrentClipId() != "animations/player_Jump.csv") {
+            animator.Play("animations/player_Jump.csv");
+        }
+    }
+    // 공중에 있는 경우 (점프 중)
+    else if (isJumping) {
+        // 점프 상승 중
+        if (velocity.y < 0 && animator.GetCurrentClipId() != "animations/player_JumpUp.csv") {
+            animator.Play("animations/player_JumpUp.csv");
+        }
+        // 점프 하강 중
+        else if (velocity.y > 0 && animator.GetCurrentClipId() != "animations/player_JumpDown.csv") {
+            animator.Play("animations/player_JumpDown.csv");
+        }
+    }
+    // 땅에 닿아 있고, 이동 중이지 않을 때
+    else if (isGrounded && std::abs(velocity.x) < 0.1f) {
+        if (animator.GetCurrentClipId() != "animations/player_Idle.csv") {
+            animator.Play("animations/player_Idle.csv");
+        }
+    }
+    // 땅에 닿아 있고, 이동 중일 때
+    else if (isGrounded && std::abs(velocity.x) >= 0.1f) {
+        if (animator.GetCurrentClipId() != "animations/player_Move.csv") {
+            animator.Play("animations/player_Move.csv");
+        }
+    }
+}
+
+void Player::StartJumpCharging()
+{
+    isJumpCharging = true;
+    jumpStartTime = timer.getElapsedTime().asSeconds();
+}
+
+void Player::PerformJump()
+{
+    isJumpCharging = false;
+    isJumping = true;
+    float chargeTime = std::min(timer.getElapsedTime().asSeconds() - jumpStartTime, maxjumpTime);
+
+    // 점프 높이 설정
+    velocity.y = -sqrt(8 * gravity * (100.f * chargeTime)); // 점프 높이 조절
+
+    // 차징 중 설정된 방향으로 점프
+    velocity.x = jumpDirection * moveSpeed;
 }
 
 void Player::CheckCollision()
