@@ -5,15 +5,12 @@
 
 class Player:public SpriteGo
 {
-    enum playerState
-    {
-        idle,
-        move,
-        jump,
-        jumpup,
-        jumpdown,
-        fell,
-        
+    enum class JumpPhase {
+        Grounded,
+        Charging,
+        Rising,
+        Falling,
+        Landing
     };
     struct ClipInfo
     {
@@ -56,7 +53,7 @@ protected:
     float currentHeight;
     sf::Clock timer;
     GameScene* gameScene;
-
+    JumpPhase jumpPhase;
     float groundYPosition=510.f;
 public:
     Player(const std::string& name = "");
