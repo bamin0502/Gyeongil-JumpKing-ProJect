@@ -72,6 +72,6 @@ public:
     void StartJumpCharging();
     void PerformJump();
     
-    void CheckCollision();
+    bool CheckCollision(const sf::Image& image);
     
 };

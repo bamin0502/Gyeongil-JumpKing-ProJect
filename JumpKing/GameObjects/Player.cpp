@@ -28,6 +28,7 @@ void Player::Update(float dt) {
     HandleInput();
     UpdateMovement(dt);
     UpdateAnimation();
+    
     SetPosition(position);
 }
 
@@ -100,6 +101,8 @@ void Player::UpdateAnimation() {
             } else {
                 animator.Play("animations/player_Move.csv");
             }
+            //나중에 추락 관련 처리
+            //if()
             break;
     }
 }
@@ -132,5 +135,25 @@ void Player::PerformJump() {
     sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f);
 }
 
-void Player::CheckCollision() {
+bool Player::CheckCollision(const sf::Image& image) {
+    sf::Vector2i playerPosition=static_cast<sf::Vector2i>(this->GetPosition());
+
+    sf::Color obstacleColor=sf::Color::Red;
+
+    for(int y=0; y<sprite.getGlobalBounds().height; ++y)
+    {
+        for(int x=0; x<sprite.getGlobalBounds().width; ++x)
+        {
+            sf::Vector2i pixelPosition=playerPosition+sf::Vector2i(x,y);
+            if(pixelPosition.x<0 || pixelPosition.x>=image.getSize().x || pixelPosition.y<0 || pixelPosition.y>=image.getSize().y)
+            {
+                continue;
+            }
+            if(image.getPixel(pixelPosition.x,pixelPosition.y)==obstacleColor)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
