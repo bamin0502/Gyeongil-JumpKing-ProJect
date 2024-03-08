@@ -13,6 +13,7 @@
 #include <queue>
 #include <string>
 #include <functional>
+#include <algorithm>
 
 // SFML
 #include <SFML/Graphics.hpp>

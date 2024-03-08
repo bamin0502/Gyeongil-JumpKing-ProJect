@@ -23,12 +23,12 @@ void Player::Reset() {
 void Player::Update(float dt) {
     SpriteGo::Update(dt);
     animator.Update(dt);
+    
     HandleInput();
-    // 차징 시간이 1초를 초과했는지 확인하고, 조건을 충족하면 자동으로 점프 실행
     if (isJumpCharging) {
         float chargingTime = timer.getElapsedTime().asSeconds() - jumpStartTime;
         if (chargingTime > 1.0f) { 
-            PerformJump(); // 자동 점프 실행
+            PerformJump(); 
         }
     }
     UpdateMovement(dt);
@@ -62,7 +62,6 @@ void Player::HandleInput() {
     if (InputMgr::GetKeyDown(sf::Keyboard::Space) && isGrounded) {
         StartJumpCharging();
     }
-    // 여기에 isJumpCharging 조건을 명확히 추가합니다.
     if (InputMgr::GetKeyUp(sf::Keyboard::Space) && isJumpCharging) {
         PerformJump();
     }
@@ -116,25 +115,28 @@ void Player::StartJumpCharging() {
     jumpStartTime = timer.getElapsedTime().asSeconds();
 }
 
+float calculateJumpHeight(float chargeDuration, float maxJumpHeight)
+{
+    const int levels = 35; 
+    const float maxChargeTime = 1.5f; 
+    float levelDuration = maxChargeTime / levels; 
+    int level = std::min(static_cast<int>(chargeDuration / levelDuration), levels);
+    float jumpHeight = maxJumpHeight * (level / static_cast<float>(levels));
+
+    return jumpHeight;
+}
 void Player::PerformJump() {
-    // 차징 상태 해제 및 점프 상태 설정
+    float chargeDuration = timer.getElapsedTime().asSeconds() - jumpStartTime;
+    float jumpHeight = calculateJumpHeight(chargeDuration, maxJumpHeight);
+
     isJumpCharging = false;
     isJumping = true;
     jumpPhase = JumpPhase::Rising;
+    
+    velocity.y = -sqrt(2 * gravity * jumpHeight); 
+    velocity.x = jumpDirection * moveSpeed * 0.5; 
 
-    float chargeDuration = timer.getElapsedTime().asSeconds() - jumpStartTime;
-    float jumpHeight = sqrt(8 * gravity * jumpHeightFactor * chargeDuration); // 계산된 점프 높이
-
-    // 최대 점프 높이를 초과하지 않도록 조정
-    if (jumpHeight > maxJumpHeight) {
-        jumpHeight = maxJumpHeight;
-    }
-
-    velocity.y = -jumpHeight; // Y축 속도에 점프 높이 적용
-    velocity.x = jumpDirection * moveSpeed * 0.5;
-
-    // 스프라이트 반전 설정
-    sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f);
+    sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f); 
 }
 
 bool Player::CheckCollision(const sf::Image& image) {
