@@ -44,26 +44,20 @@ void Player::Draw(sf::RenderWindow& window) {
 }
 
 void Player::HandleInput() {
-    // 방향키 입력 처리
-    float directionInput = 0.f;
+    jumpDirection = 0.f;
     if (InputMgr::GetKey(sf::Keyboard::Left)) {
-        directionInput -= 1.f;
-        sprite.setScale(-1.f, 1.f); // 왼쪽으로 이동 시 스프라이트 반전
-    }
-    if (InputMgr::GetKey(sf::Keyboard::Right)) {
-        directionInput += 1.f;
-        sprite.setScale(1.f, 1.f); // 오른쪽으로 이동 시 스프라이트 정방향
+        jumpDirection = -1.f;
+        sprite.setScale(-1.f, 1.f);
+    } else if (InputMgr::GetKey(sf::Keyboard::Right)) {
+        jumpDirection = 1.f;
+        sprite.setScale(1.f, 1.f);
     }
 
-    if (jumpPhase == JumpPhase::Grounded) {
-        jumpDirection = directionInput;
-
-        if (InputMgr::GetKeyDown(sf::Keyboard::Space)) {
-            StartJumpCharging();
-        }
-    } else if (jumpPhase == JumpPhase::Charging && InputMgr::GetKeyUp(sf::Keyboard::Space)) {
-        // 차징 중 방향키를 고려하여 점프 방향 결정
-        jumpDirection = directionInput;
+    if (InputMgr::GetKeyDown(sf::Keyboard::Space) && isGrounded) {
+        StartJumpCharging();
+    }
+    // 여기에 isJumpCharging 조건을 명확히 추가합니다.
+    if (InputMgr::GetKeyUp(sf::Keyboard::Space) && isJumpCharging) {
         PerformJump();
     }
 }
@@ -111,24 +105,31 @@ void Player::UpdateAnimation() {
 }
 
 void Player::StartJumpCharging() {
+    isJumpCharging = true;
     jumpPhase = JumpPhase::Charging;
     jumpStartTime = timer.getElapsedTime().asSeconds();
 }
 
 void Player::PerformJump() {
+    // 차징 상태 해제
     isJumpCharging = false;
+    // 점프 상태 설정
     isJumping = true;
-    float chargeTime = std::min(timer.getElapsedTime().asSeconds() - jumpStartTime, maxjumpTime);
-    velocity.y = -sqrt(8 * gravity * (100.f * chargeTime));
-
-    if (jumpDirection != 0) {
-        velocity.x = jumpDirection * (moveSpeed * 0.5);
-    }
-    else {
-        velocity.x = 0;
-    }
-
     jumpPhase = JumpPhase::Rising;
+
+    float chargeDuration = timer.getElapsedTime().asSeconds() - jumpStartTime;
+    if (chargeDuration < 0.2f) {
+        // 짧게 눌렀을 경우의 처리
+        velocity.x = jumpDirection * moveSpeed;
+        velocity.y = -sqrt(gravity * jumpHeightFactor * 0.2f);
+    } else {
+        // 일반적인 점프 처리
+        velocity.y = -sqrt(8*gravity * jumpHeightFactor * chargeDuration);
+        velocity.x = jumpDirection * moveSpeed * 0.5;
+    }
+
+    // 점프 후 방향에 따른 스프라이트 반전 설정
+    sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f);
 }
 
 void Player::CheckCollision() {
