@@ -50,13 +50,15 @@ void Player::Draw(sf::RenderWindow& window) {
 }
 
 void Player::HandleInput() {
-    jumpDirection = 0.f;
-    if (InputMgr::GetKey(sf::Keyboard::Left)) {
-        jumpDirection = -1.f;
-        sprite.setScale(-1.f, 1.f);
-    } else if (InputMgr::GetKey(sf::Keyboard::Right)) {
-        jumpDirection = 1.f;
-        sprite.setScale(1.f, 1.f);
+    if (!isJumping) {
+        jumpDirection = 0.f;
+        if (InputMgr::GetKey(sf::Keyboard::Left)) {
+            jumpDirection = -1.f;
+            sprite.setScale(-1.f, 1.f); 
+        } else if (InputMgr::GetKey(sf::Keyboard::Right)) {
+            jumpDirection = 1.f;
+            sprite.setScale(1.f, 1.f); 
+        }
     }
 
     
@@ -95,22 +97,33 @@ void Player::UpdateMovement(float dt) {
 
 void Player::UpdateAnimation() {
     switch (jumpPhase) {
-        case JumpPhase::Charging:
+    case JumpPhase::Charging:
+        if (animator.GetCurrentClipId() != "animations/player_Jump.csv") {
             animator.Play("animations/player_Jump.csv");
-            break;
-        case JumpPhase::Rising:
+        }
+        break;
+    case JumpPhase::Rising:
+        if (animator.GetCurrentClipId() != "animations/player_JumpUp.csv") {
             animator.Play("animations/player_JumpUp.csv");
-            break;
-        case JumpPhase::Falling:
+        }
+        break;
+    case JumpPhase::Falling:
+        if (animator.GetCurrentClipId() != "animations/player_JumpDown.csv") {
             animator.Play("animations/player_JumpDown.csv");
-            break;
-        case JumpPhase::Grounded:
-            if (std::abs(velocity.x) < 0.1f) {
-                animator.Play("animations/player_Idle.csv");
+        }
+        break;
+    case JumpPhase::Grounded:
+        // 점프 후 이동 중인 경우 Move 애니메이션으로 전환
+            if (std::abs(velocity.x) >= 0.1f) {
+                if (animator.GetCurrentClipId() != "animations/player_Move.csv") {
+                    animator.Play("animations/player_Move.csv");
+                }
             } else {
-                animator.Play("animations/player_Move.csv");
+                if (animator.GetCurrentClipId() != "animations/player_Idle.csv") {
+                    animator.Play("animations/player_Idle.csv");
+                }
             }
-            break;
+        break;
     }
 }
 
