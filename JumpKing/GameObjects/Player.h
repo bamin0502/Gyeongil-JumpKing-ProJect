@@ -69,7 +69,7 @@ public:
     void FixedUpdate(float dt) override;
     void Draw(sf::RenderWindow& window) override;
 
-    void HandleInput(float dt);
+    void HandleInput();
     void UpdateMovement(float dt);
     void UpdateAnimation();
     void StartJumpCharging();

@@ -33,7 +33,7 @@ void Player::Update(float dt)
 
     animator.Update(dt);
 
-    HandleInput(dt);
+    HandleInput();
     UpdateMovement(dt);
     UpdateAnimation();
 
@@ -56,7 +56,7 @@ void Player::Draw(sf::RenderWindow& window)
     window.draw(sprite);
 }
 
-void Player::HandleInput(float dt)
+void Player::HandleInput()
 {
     if (isGrounded && !isJumpCharging) {
         jumpDirection = 0.f;
@@ -153,12 +153,17 @@ void Player::PerformJump()
     isJumpCharging = false;
     isJumping = true;
     float chargeTime = std::min(timer.getElapsedTime().asSeconds() - jumpStartTime, maxjumpTime);
-
+    
     // 점프 높이 설정
     velocity.y = -sqrt(8 * gravity * (100.f * chargeTime)); // 점프 높이 조절
 
-    // 차징 중 설정된 방향으로 점프
-    velocity.x = jumpDirection * moveSpeed;
+    // 차징 시간에 따른 X축 속도 조절
+    float jumpDurationFactor = std::min(chargeTime / maxjumpTime, 1.0f); // 0과 1 사이의 값을 가짐
+    if(jumpDirection != 0) {
+        velocity.x = jumpDirection * (moveSpeed * jumpDurationFactor * 0.5); // 차징 시간이 짧으면 X축 이동 거리 감소
+    } else {
+        velocity.x = 0; // 제자리 점프 시 좌우 이동 없음
+    }
 }
 
 void Player::CheckCollision()
