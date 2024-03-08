@@ -20,12 +20,12 @@ protected:
     
     MapTile* mapTile;
     Player* player;
-    SpriteGo* background;
     
+    sf::View worldView;
 public:
     GameScene(SceneIds id);
     ~GameScene() override;
-    
+    SpriteGo* background;
     GameScene(const GameScene&) = delete;
     GameScene(GameScene&&) = delete;
     GameScene& operator=(const GameScene&) = delete;

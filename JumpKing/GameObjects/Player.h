@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SpriteGo.h"
 #include "Animator.h"
+#include "GameScene.h"
 
 class Player:public SpriteGo
 {
@@ -10,7 +11,9 @@ class Player:public SpriteGo
         move,
         jump,
         jumpup,
-        jumpdown
+        jumpdown,
+        fell,
+        
     };
     struct ClipInfo
     {
@@ -51,10 +54,11 @@ protected:
     int currentJumpStage;
     float currentHeight;
     sf::Clock timer;
+    GameScene* gameScene;
+
     
 public:
     Player(const std::string& name = "");
-    ~Player() override;
 
     void Init() override;
     void Release() override;

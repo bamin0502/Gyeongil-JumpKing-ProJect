@@ -8,28 +8,21 @@ Player::Player(const std::string& name)
 {
 }
 
-Player::~Player()
-{
-}
+
 
 void Player::Init()
 {
-    SpriteGo::Init();
     
     animator.SetTarget(&sprite);
-    
-    sprite.setPosition({ 0.f, -1200.f });
 }
 
 void Player::Release()
 {
-    SpriteGo::Release();
+    
 }
 
 void Player::Reset()
 {
-    SpriteGo::Reset();
-
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
 }
