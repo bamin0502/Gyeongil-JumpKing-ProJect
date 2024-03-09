@@ -16,6 +16,7 @@ void Player::Release() {
 void Player::Reset() {
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
+    
     SetPosition({0.f, 510.f});
     jumpPhase = JumpPhase::Grounded;
 }
@@ -23,7 +24,7 @@ void Player::Reset() {
 void Player::Update(float dt) {
     SpriteGo::Update(dt);
     animator.Update(dt);
-    
+
     HandleInput();
     if (isJumpCharging) {
         float chargingTime = timer.getElapsedTime().asSeconds() - jumpStartTime;
@@ -60,6 +61,7 @@ void Player::HandleInput() {
             sprite.setScale(1.f, 1.f); 
         }
     }
+    
 
     
     if (InputMgr::GetKeyDown(sf::Keyboard::Space) && isGrounded && !isJumping) {
@@ -158,26 +160,24 @@ void Player::PerformJump() {
 }
 
 bool Player::CheckCollision(const sf::Image& image) {
-    sf::Vector2i playerPosition=static_cast<sf::Vector2i>(this->GetPosition());
+    sf::FloatRect playerBounds = sprite.getGlobalBounds();
+    sf::Vector2u imageSize = image.getSize();
 
-    sf::Color obstacleColor=sf::Color::Red;
+   
+    sf::IntRect playerRect(static_cast<int>(playerBounds.left), static_cast<int>(playerBounds.top),
+                           static_cast<int>(playerBounds.width), static_cast<int>(playerBounds.height));
 
-    for(int y=0; y<sprite.getGlobalBounds().height; ++y)
-    {
-        for(int x=0; x<sprite.getGlobalBounds().width; ++x)
-        {
-            sf::Vector2i pixelPosition=playerPosition+sf::Vector2i(x,y);
-            if(pixelPosition.x<0 || pixelPosition.x>=image.getSize().x || pixelPosition.y<0 || pixelPosition.y>=image.getSize().y)
-            {
-                continue;
-            }
-            if(image.getPixel(pixelPosition.x,pixelPosition.y)==obstacleColor)
-            {
-                std::cout<<"Collision detected"<<std::endl;
-                return true;
+    for (int y = playerRect.top; y < playerRect.top + playerRect.height; ++y) {
+        for (int x = playerRect.left; x < playerRect.left + playerRect.width; ++x) {
+            
+            if (x >= 0 && x < static_cast<int>(imageSize.x) && y >= 0 && y < static_cast<int>(imageSize.y)) {
+                sf::Color pixelColor = image.getPixel(x, y);
                 
+                if (pixelColor == sf::Color::Red) {
+                    return true; 
+                }
             }
         }
     }
-    return false;
+    return false; // No collision
 }

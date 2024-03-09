@@ -18,14 +18,14 @@ protected:
     float fadeoutDuration;
     bool isFadingOut=false;
     
-    MapTile* mapTile;
     Player* player;
-    
-    sf::View worldView;
+    sf::Image map1Texture;
+    sf::Texture map1PixelTexture;
 public:
     GameScene(SceneIds id);
     ~GameScene() override;
     SpriteGo* background;
+    
     GameScene(const GameScene&) = delete;
     GameScene(GameScene&&) = delete;
     GameScene& operator=(const GameScene&) = delete;
@@ -39,4 +39,5 @@ public:
     void LateUpdate(float dt) override;
     void FixedUpdate(float dt) override;
     void Draw(sf::RenderWindow& window) override;
+
 };
