@@ -14,10 +14,11 @@ void Player::Release() {
 }
 
 void Player::Reset() {
+    gameScene = dynamic_cast<GameScene*>(SCENE_MGR.GetCurrentScene());
+    collisionMap=gameScene->map1Texture;
     animator.Play("animations/player_Idle.csv");
     SetOrigin(Origins::BC);
     
-    SetPosition({0.f, 510.f});
     jumpPhase = JumpPhase::Grounded;
 }
 
@@ -26,6 +27,15 @@ void Player::Update(float dt) {
     animator.Update(dt);
 
     HandleInput();
+    if(gameScene->IsPlayerInView(position))
+    {
+        CheckCollision();
+    }
+    else
+    {
+        isGrounded = false;
+    }
+    
     if (isJumpCharging) {
         float chargingTime = timer.getElapsedTime().asSeconds() - jumpStartTime;
         if (chargingTime > 1.0f) { 
@@ -40,10 +50,13 @@ void Player::Update(float dt) {
 
 void Player::LateUpdate(float dt) {
     SpriteGo::LateUpdate(dt);
+
 }
 
 void Player::FixedUpdate(float dt) {
     SpriteGo::FixedUpdate(dt);
+
+    
 }
 
 void Player::Draw(sf::RenderWindow& window) {
@@ -61,8 +74,6 @@ void Player::HandleInput() {
             sprite.setScale(1.f, 1.f); 
         }
     }
-    
-
     
     if (InputMgr::GetKeyDown(sf::Keyboard::Space) && isGrounded && !isJumping) {
         StartJumpCharging();
@@ -91,6 +102,7 @@ void Player::UpdateMovement(float dt) {
         case JumpPhase::Grounded:
             velocity.x = jumpDirection * moveSpeed;
             position += velocity * dt;
+
             break;
         default:
             break;
@@ -159,25 +171,43 @@ void Player::PerformJump() {
     sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f); 
 }
 
-bool Player::CheckCollision(const sf::Image& image) {
-    sf::FloatRect playerBounds = sprite.getGlobalBounds();
-    sf::Vector2u imageSize = image.getSize();
+void Player::CheckCollision()
+{
+    sf::Vector2f playerPixelPos = gameScene->PlayerBoundsWorldToView(position);
+    sf::IntRect playerBounds(playerPixelPos.x, playerPixelPos.y, sprite.getLocalBounds().width, sprite.getLocalBounds().height);
 
-   
-    sf::IntRect playerRect(static_cast<int>(playerBounds.left), static_cast<int>(playerBounds.top),
-                           static_cast<int>(playerBounds.width), static_cast<int>(playerBounds.height));
-
-    for (int y = playerRect.top; y < playerRect.top + playerRect.height; ++y) {
-        for (int x = playerRect.left; x < playerRect.left + playerRect.width; ++x) {
-            
-            if (x >= 0 && x < static_cast<int>(imageSize.x) && y >= 0 && y < static_cast<int>(imageSize.y)) {
-                sf::Color pixelColor = image.getPixel(x, y);
-                
-                if (pixelColor == sf::Color::Red) {
-                    return true; 
-                }
+    for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x++) {
+        for (int y = playerBounds.top; y < playerBounds.top + playerBounds.height; y++) {
+            if (collisionMap.getPixel(x, y).a == 255) {
+                HandleCollisionResponse(GetGlobalBounds());
+                return;
             }
         }
     }
-    return false; // No collision
 }
+
+void Player::HandleCollisionResponse(const sf::FloatRect& globalBounds)
+{
+    if (velocity.y > 0) { // 하강 중이라면
+        position.y = globalBounds.top - playerBounds.height; // 플레이어를 충돌 지점 바로 위로 이동
+        velocity.y = 0; // Y축 속도를 0으로 설정하여 추가 하강을 방지
+        isJumping = false; // 점프 상태 해제
+        jumpPhase = JumpPhase::Grounded; // 점프 상태를 '지면에 있음'으로 변경
+    }
+    else if (velocity.y < 0) { // 상승 중이라면
+        position.y = globalBounds.top + globalBounds.height; // 플레이어를 충돌 지점 바로 아래로 이동
+        velocity.y = 0; // Y축 속도를 0으로 설정하여 추가 상승을 방지
+    }
+
+    if (velocity.x > 0) { // 우측 이동 중이라면
+        position.x = globalBounds.left - playerBounds.width; // 플레이어를 충돌 지점 바로 왼쪽으로 이동
+    }
+    else if (velocity.x < 0) { // 좌측 이동 중이라면
+        position.x = globalBounds.left + globalBounds.width; // 플레이어를 충돌 지점 바로 오른쪽으로 이동
+    }
+}
+
+
+
+
+

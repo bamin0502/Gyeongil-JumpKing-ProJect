@@ -19,13 +19,15 @@ protected:
     bool isFadingOut=false;
     
     Player* player;
-    sf::Image map1Texture;
-    sf::Texture map1PixelTexture;
+
 public:
     GameScene(SceneIds id);
     ~GameScene() override;
     SpriteGo* background;
-    
+    sf::Image map1Texture;
+    sf::Texture map1PixelTexture;
+    sf::Sprite map1Sprite;
+    SpriteGo* map1;
     GameScene(const GameScene&) = delete;
     GameScene(GameScene&&) = delete;
     GameScene& operator=(const GameScene&) = delete;
@@ -40,4 +42,6 @@ public:
     void FixedUpdate(float dt) override;
     void Draw(sf::RenderWindow& window) override;
 
+    sf::Vector2f PlayerBoundsWorldToView(sf::Vector2f playerPosition);
+    bool IsPlayerInView(sf::Vector2f playerPosition);
 };

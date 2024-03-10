@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "SpriteGo.h"
 #include "Animator.h"
-#include "GameScene.h"
+
+class GameScene;
 
 class Player:public SpriteGo
 {
@@ -30,15 +31,20 @@ class Player:public SpriteGo
         
     };
 protected:
+    JumpPhase jumpPhase;
+    
     Animator animator;
-
-    float moveSpeed=300.f;
     sf::Vector2f velocity;
+    sf::Clock timer;
+    GameScene* gameScene;
+    sf::Image collisionMap;
+    sf::FloatRect playerBounds;
+    
+    float moveSpeed=300.f;
     bool isGrounded=true;
     bool isFalling=false;
     bool isJumpCharging=false;
     float gravity=300.f;
-
     float jumpHeightFactor=100.f;
     float jumpHeight;
     float jumpDirection;
@@ -52,10 +58,8 @@ protected:
     int currentJumpStage;
     float currentHeight;
     float maxJumpHeight = 380.0f;
-    sf::Clock timer;
-    GameScene* gameScene;
-    JumpPhase jumpPhase;
     float groundYPosition=510.f;
+
 public:
     Player(const std::string& name = "");
 
@@ -72,7 +76,7 @@ public:
     void UpdateAnimation();
     void StartJumpCharging();
     void PerformJump();
+    void CheckCollision();
     
-    bool CheckCollision(const sf::Image& image);
-    
+    void HandleCollisionResponse(const sf::FloatRect& globalBounds);
 };
