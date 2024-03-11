@@ -12,18 +12,21 @@ class GameScene:public Scene
 {
 protected:
     std::wstring str= L"\t\t\t\t전설에 따르면\n정상에 정말 끝내주는 아가씨가 있다고 하는데...";
-    TextGo* introText;
+    TextGo* introText = nullptr;
     
     float fadeoutElapsedTime;
     float fadeoutDuration;
     bool isFadingOut=false;
     
-    Player* player;
+    
 
 public:
+    Player* player;
     GameScene(SceneIds id);
     ~GameScene() override;
     SpriteGo* background;
+    SpriteGo* background2;
+    SpriteGo* background3;
     sf::Image map1Texture;
     sf::Texture map1PixelTexture;
     sf::Sprite map1Sprite;
@@ -43,5 +46,5 @@ public:
     void Draw(sf::RenderWindow& window) override;
 
     sf::Vector2f PlayerBoundsWorldToView(sf::Vector2f playerPosition);
-    bool IsPlayerInView(sf::Vector2f playerPosition);
+    bool IsPlayerInView(sf::Vector2f playerPosition) ;
 };

@@ -6,13 +6,6 @@ class GameScene;
 
 class Player:public SpriteGo
 {
-    enum class JumpPhase {
-        Grounded,
-        Charging,
-        Rising,
-        Falling,
-        Landing
-    };
     struct ClipInfo
     {
         std::string idle;
@@ -30,9 +23,16 @@ class Player:public SpriteGo
             :idle(idle), move(move), jump(jump),jumpup(jumpup),jumpdown(jumpdown),filpX(flipX), point(point) {}
         
     };
-protected:
+public:
+    enum class JumpPhase {
+        Grounded,
+        Charging,
+        Rising,
+        Falling,
+        Landing
+    };
     JumpPhase jumpPhase;
-    
+protected:
     Animator animator;
     sf::Vector2f velocity;
     sf::Clock timer;
@@ -58,7 +58,7 @@ protected:
     int currentJumpStage;
     float currentHeight;
     float maxJumpHeight = 380.0f;
-    float groundYPosition=510.f;
+    float groundYPosition=210.f;
 
 public:
     Player(const std::string& name = "");
