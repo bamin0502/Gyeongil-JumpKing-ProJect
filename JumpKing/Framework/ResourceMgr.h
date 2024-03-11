@@ -81,3 +81,4 @@ T ResourceMgr<T>::Empty;
 #define RES_MGR_TEXTURE (ResourceMgr<sf::Texture>::Instance())
 #define RES_MGR_FONT (ResourceMgr<sf::Font>::Instance())
 #define RES_MGR_SOUND_BUFFER (ResourceMgr<sf::SoundBuffer>::Instance())
+#define RES_MGR_ANIMATION_CLIP (ResourceMgr<AnimationClip>::Instance())

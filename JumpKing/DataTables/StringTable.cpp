@@ -1,6 +1,4 @@
-﻿#include "StringTable.h"
-#include "rapidcsv.h"
-#include "pch.h"
+﻿#include "pch.h"
 StringTable::StringTable(Types t):DataTable(t)
 {
     
@@ -14,19 +12,19 @@ bool StringTable::Load(Languages languages)
 {
     static std::vector<std::string> filePathArray=
     {
-        "tables/StringTable_KR.csv",
-        "tables/StringTable_EN.csv"
+
     };
     currLang=languages;
 
     table.clear();
-    rapidcsv::Document doc(filePathArray[static_cast<int>(languages)],rapidcsv::LabelParams(0, -1));
+    //이거때문에 안열리는 거였다 주석으로 일단 가리고 기억하자
+    //rapidcsv::Document doc(filePathArray[static_cast<int>(languages)],rapidcsv::LabelParams(0, -1));
     
-    for(int i=0; i<doc.GetRowCount(); i++)
+    /*for(int i=0; i<doc.GetRowCount(); i++)
     {
         std::vector<std::string> pair=doc.GetRow<std::string>(i);
         table.insert({pair[0],pair[1]});
-    }
+    }*/
 
     return true;
 }

@@ -12,8 +12,8 @@ public:
 	sf::FloatRect GetLocalBounds() override;
 	sf::FloatRect GetGlobalBounds() override;
 	
-
 	void SetString(const std::string& str);
+	void SetString(const std::wstring& str);
 	void Set(const sf::Font& texture, const std::string& str, int size, const sf::Color& color);
 
 	void SetFont(const std::string& textureId);
@@ -29,7 +29,9 @@ public:
 	
 	void SetFlipX(bool filp) override;
 	void SetFlipY(bool filp) override;
+	void SetAlpha(float alpha);
 
+	void SetFontColor(const sf::Color& color);
 	void Draw(sf::RenderWindow& window) override;
 };
 

@@ -1,0 +1,5 @@
+ID,FPS,"LOOPTYPE (0:Single , 1:Loop , 2:PingPong)",,
+jumpup,4,1,,
+,,,,
+TEXTURE ID,LEFT,TOP,WIDTH,HEIGHT
+graphics/player_sheet.png,0,300,60,60

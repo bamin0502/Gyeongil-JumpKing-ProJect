@@ -10,16 +10,22 @@
 #include <vector>
 #include <list>
 #include <unordered_map>
+#include <queue>
+#include <string>
+#include <functional>
+#include <algorithm>
 
 // SFML
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <SFML/System/Clock.hpp>
 
 #include "Defines.h"
 #include "Utils.h"
 #include "Framework.h"
 #include "InputMgr.h"
 #include "ResourceMgr.h"
+#include "Animator.h"
 #include "SceneMgr.h"
 #include "SoundMgr.h"
 #include "Scene.h"
@@ -27,4 +33,3 @@
 #include "GameObject.h"
 #include "DataTableMgr.h"
 #include "StringTable.h"
-#include "ZombieTable.h"

@@ -26,6 +26,7 @@ private:
 	static std::list<sf::Keyboard::Key> upList;
 	static std::list<sf::Keyboard::Key> ingList;
 
+
 	static sf::Vector2f mousePos;
 
 public:
@@ -41,6 +42,7 @@ public:
 	static bool GetKeyDown(sf::Keyboard::Key key);
 	static bool GetKeyUp(sf::Keyboard::Key key);
 	static bool GetKey(sf::Keyboard::Key key);
+
 
 	static sf::Vector2f GetMousePos()
 	{

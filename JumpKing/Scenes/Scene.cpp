@@ -58,6 +58,11 @@ void Scene::Release()
 
 void Scene::Enter()
 {
+	sf::Vector2f windowSize = (sf::Vector2f)FRAMEWORK.GetWindowSize();
+	sf::Vector2f centerPos = windowSize * 0.5f;
+	worldView.setSize(windowSize);
+	worldView.setCenter({ 0.f, 0.f });
+
 	for (auto obj : gameObjects)
 	{
 		obj->Reset();
@@ -159,22 +164,6 @@ void Scene::FixedUpdate(float dt)
 
 void Scene::Draw(sf::RenderWindow& window)
 {
-	//gameObjects.sort([](auto a, auto b) {
-	//	if (a->sortLayer != b->sortLayer)
-	//	{
-	//		return a->sortLayer < b->sortLayer;
-	//	}
-	//	return a->sortOrder < b->sortOrder;
-	//});
-
-	//uiGameObjects.sort([](auto a, auto b) {
-	//	if (a->sortLayer != b->sortLayer)
-	//	{
-	//		return a->sortLayer < b->sortLayer;
-	//	}
-	//	return a->sortOrder < b->sortOrder;
-	//});
-
 	const sf::View& saveView = window.getView();
 
 	window.setView(worldView);

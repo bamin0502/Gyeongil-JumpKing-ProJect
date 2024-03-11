@@ -90,6 +90,13 @@ void SpriteGo::SetFlipY(bool filp)
 	SetScale(scale);
 }
 
+void SpriteGo::SetAlpha(float alpha)
+{
+	sf::Color color = sprite.getColor();
+	color.a = static_cast<sf::Uint8>(alpha);
+	sprite.setColor(color);
+}
+
 void SpriteGo::Reset()
 {
 	sprite.setTexture(RES_MGR_TEXTURE.Get(textureId));
