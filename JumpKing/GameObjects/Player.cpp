@@ -167,8 +167,9 @@ void Player::PerformJump() {
     isJumpCharging = false;
     isJumping = true;
     jumpPhase = JumpPhase::Rising;
-    
-    velocity.y = -sqrt(2 * gravity * jumpHeight); 
+
+    //2였지만 일단 잘되는지 테스트를 위해서 수정
+    velocity.y = -sqrt(6 * gravity * jumpHeight); 
     velocity.x = jumpDirection * moveSpeed * 0.5; 
 
     sprite.setScale(jumpDirection < 0 ? -1.f : 1.f, 1.f);
