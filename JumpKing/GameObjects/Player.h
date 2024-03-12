@@ -16,9 +16,8 @@ class Player:public SpriteGo
         bool filpX=false;
         sf::Vector2f point;
         ClipInfo()
-        {
-            
-        }
+        = default;
+
         ClipInfo(const std::string& idle, const std::string& move,const std::string& jump,const std::string& jumpup,const std::string& jumpdown, bool flipX, const sf::Vector2f& point)
             :idle(idle), move(move), jump(jump),jumpup(jumpup),jumpdown(jumpdown),filpX(flipX), point(point) {}
         
@@ -36,9 +35,15 @@ protected:
     Animator animator;
     sf::Vector2f velocity;
     sf::Clock timer;
-    GameScene* gameScene;
+    GameScene* gameScene=nullptr;
     sf::Image collisionMap;
     sf::FloatRect playerBounds;
+    sf::FloatRect mapBounds;
+
+    bool isBottomCollider=false;
+    bool isTopCollider=false;
+    bool isLeftCollider=false;
+    bool isRightCollider=false;
     
     float moveSpeed=300.f;
     bool isGrounded=true;
@@ -76,7 +81,9 @@ public:
     void UpdateAnimation();
     void StartJumpCharging();
     void PerformJump();
-    void CheckCollision();
+
+    bool isCollision(sf::Vector2f position);
+    int checkCollision(sf::Vector2f newPosition);
+
     
-    void HandleCollisionResponse(const sf::FloatRect& globalBounds);
 };

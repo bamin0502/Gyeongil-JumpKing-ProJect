@@ -27,6 +27,8 @@ public:
 	void SetFlipY(bool filp) override;
 	void SetAlpha(float alpha);
 
+	const sf::Texture* GetSprite() const { return sprite.getTexture(); }
+
 	void Reset() override;
 	void Draw(sf::RenderWindow& window) override;
 
