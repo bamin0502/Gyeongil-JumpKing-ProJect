@@ -3,10 +3,10 @@
 class SpriteGo : public GameObject
 {
 protected:
-	sf::Sprite sprite;
 	std::string textureId;
 
 public:
+	sf::Sprite sprite;
 	SpriteGo(const std::string& name = "");
 
 	sf::FloatRect GetLocalBounds() override;
@@ -32,5 +32,6 @@ public:
 	void Reset() override;
 	void Draw(sf::RenderWindow& window) override;
 
+	
 };
 

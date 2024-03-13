@@ -2,10 +2,32 @@
 #include "SpriteGo.h"
 #include "Animator.h"
 
+
 class GameScene;
 
 class Player:public SpriteGo
 {
+public:
+    enum class CollisionType
+    {
+        NONE=0,
+        LEFT=1<<0,
+        RIGHT=1<<1,
+        TOP=1<<2,
+        BOTTOM=1<<3,
+    };
+
+
+    CollisionType collisionType;
+    enum class PlayerPhase {
+        Grounded,
+        Charging,
+        Rising,
+        Falling,
+        Landing
+    };
+    PlayerPhase jumpPhase;
+private:
     struct ClipInfo
     {
         std::string idle;
@@ -20,17 +42,8 @@ class Player:public SpriteGo
 
         ClipInfo(const std::string& idle, const std::string& move,const std::string& jump,const std::string& jumpup,const std::string& jumpdown, bool flipX, const sf::Vector2f& point)
             :idle(idle), move(move), jump(jump),jumpup(jumpup),jumpdown(jumpdown),filpX(flipX), point(point) {}
-        
     };
-public:
-    enum class JumpPhase {
-        Grounded,
-        Charging,
-        Rising,
-        Falling,
-        Landing
-    };
-    JumpPhase jumpPhase;
+    
 protected:
     Animator animator;
     sf::Vector2f velocity;
@@ -40,10 +53,16 @@ protected:
     sf::FloatRect playerBounds;
     sf::FloatRect mapBounds;
 
-    bool isBottomCollider=false;
-    bool isTopCollider=false;
-    bool isLeftCollider=false;
-    bool isRightCollider=false;
+    //플레이어 이동을 판정하게할 충돌체크형 Bool문
+    bool isCollidingLeft=false;
+    bool isCollidingRight=false;
+    bool isCollidingTop=false;
+    bool isCollidingBottom=false;
+    
+    //디버그 및 테스트
+    sf::RectangleShape testRectangle;
+    bool debugMode=false;
+    bool testMode=false;
     
     float moveSpeed=300.f;
     bool isGrounded=true;
@@ -75,15 +94,19 @@ public:
     void LateUpdate(float dt) override;
     void FixedUpdate(float dt) override;
     void Draw(sf::RenderWindow& window) override;
+    void SetActive(bool active) override;
 
-    void HandleInput();
+    void HandleInput(float dt);
     void UpdateMovement(float dt);
     void UpdateAnimation();
     void StartJumpCharging();
     void PerformJump();
-
-    bool isCollision(sf::Vector2f position);
-    int checkCollision(sf::Vector2f newPosition);
-
+    
+    CollisionType CheckCollision();
+    static bool CheckGroundCollision();
+    static bool CheckWallCollision();
+    void PositionAfterCollision(sf::Vector2f& currentPosition, const sf::Vector2f& moveDirection);
+    bool CheckIfGrounded();
+    sf::Vector2f GetGroundCheckPosition();
     
 };
