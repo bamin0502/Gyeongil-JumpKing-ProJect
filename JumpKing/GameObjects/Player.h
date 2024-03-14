@@ -16,9 +16,8 @@ public:
         TOP=1<<2,
         BOTTOM=1<<3,
     };
-
-
     CollisionType collisionType;
+    
     enum class PlayerPhase {
         Grounded,
         Charging,
@@ -64,25 +63,24 @@ protected:
     bool debugMode=false;
     bool testMode=false;
     
-    float moveSpeed=300.f;
+    float moveSpeed = 100.f;
     bool isGrounded=true;
     bool isFalling=false;
     bool isJumpCharging=false;
-    float gravity=100.f;
-    float jumpHeightFactor=100.f;
+    float gravity = 100.f;
+    float jumpHeightFactor = 100.f;
     float jumpHeight;
     float jumpDirection;
-    float jumpStartTime=0;
-    float jumpTime=0.f;
-    float jumpPower=1000.f;
+    float jumpStartTime = 0;
+    float jumpTime = 0.f;
+    float jumpPower = 1000.f;
     float jumpGuage;
-    float maxjumpTime=0.6f;
-    float jumpStep=35.f;
+    float maxjumpTime = 0.6f;
+    float jumpStep = 35.f;
     bool isJumping=false;
     int currentJumpStage;
     float currentHeight;
-    float maxJumpHeight = 380.0f;
-    float groundYPosition=210.f;
+    float maxJumpHeight = 500.0f;
 
 public:
     Player(const std::string& name = "");
@@ -103,10 +101,4 @@ public:
     void PerformJump();
     
     CollisionType CheckCollision();
-    static bool CheckGroundCollision();
-    static bool CheckWallCollision();
-    //int CheckCollisionWithMap();
-    //sf::Vector2f GetGroundCheckPosition();
-    //bool CheckIfGrounded();
-    //sf::Vector2f GetGroundCheckPosition();
 };

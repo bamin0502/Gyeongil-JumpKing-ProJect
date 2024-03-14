@@ -95,8 +95,6 @@ void Player::Draw(sf::RenderWindow& window) {
         window.draw(gameScene->map1Sprite);
         window.draw(testRectangle);
     }
-
-   
 }
 
 void Player::SetActive(const bool active)
@@ -110,7 +108,7 @@ void Player::HandleInput(float dt) {
         if(isGrounded)
         {
             StartJumpCharging();
-            playerPhase=PlayerPhase::Charging;
+            //playerPhase=PlayerPhase::Charging;
         }
     }
     if(InputMgr::GetKeyUp(sf::Keyboard::Space))
@@ -132,61 +130,68 @@ void Player::UpdateMovement(float dt)
 
     sf::Vector2f currentPosition = GetPosition();
     float moveDistance = moveSpeed * dt;
-    sf::Vector2f moveDirection(0.f, 0.f);
 
-    //isGrounded= CheckIfGrounded();
+   
     
     if(isFalling)
     {
-        if (!isGrounded) {
-            velocity.y += gravity * dt; // 중력 값을 속도에 더함
-        }else{
-            velocity.y = 0;
-        }
+        velocity.y+=gravity*dt;
     }
+    
     
     // 왼쪽 또는 오른쪽으로 이동하려 할 때 충돌 확인
     if (InputMgr::GetKey(sf::Keyboard::Left) && !(static_cast<int>(collision) & static_cast<int>(CollisionType::LEFT))) {
-        moveDirection.x -= moveDistance;
-        
+        currentPosition.x -= moveDistance;
+        sprite.setScale(-1.f, 1.f);
     }
     if (InputMgr::GetKey(sf::Keyboard::Right) && !(static_cast<int>(collision) & static_cast<int>(CollisionType::RIGHT))) {
-        moveDirection.x += moveDistance;
+        currentPosition.x += moveDistance;
+        sprite.setScale(1.f, 1.f);
     }
-    sprite.setScale(moveDirection.x < 0 ? -1.f : 1.f, 1.f);
     // 점프 중에 상단 충돌 확인
     if (isJumping && (static_cast<int>(collision) & static_cast<int>(CollisionType::TOP))){
-        velocity.y = 0;
+        
         isGrounded = false;
         isJumping = false;
         isFalling = true;
-       
+        playerPhase = PlayerPhase::Falling;
     }
-    if(isFalling)
-    {
-        playerPhase=PlayerPhase::Falling;
-    }
-    // 하강 중에 하단 충돌 확인
-    if (isFalling && (static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)))
-    {
-        velocity.y = 0;
+    
+    // 점프 중에 부딪혀서 떨어지는 중에 하단 충돌 확인
+    if (isFalling && (static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM))) {
+        currentPosition.y -=5.f;
         isGrounded = true;
-        isFalling = false;
         isJumping = false;
-        playerPhase=PlayerPhase::Grounded;
+        playerPhase = PlayerPhase::Grounded;
     }
-    if(!isFalling && (static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)))
+    //점프 중에 부딪히지 않았고 떨어지는 중에 하단 충돌을 확인
+    if(!isFalling && (static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)) )
     {
-        velocity.y = 0;
-        isGrounded=true;
-        isFalling=false;
-        isJumping=false;
-        playerPhase=PlayerPhase::Grounded;
+        currentPosition.y -=5.f;
+        isGrounded = true;
+        isJumping = false;
+        playerPhase = PlayerPhase::Grounded;
     }
-    moveDirection.y += velocity.y * dt;
-    // 이동 및 충돌 처리 후의 새 위치 설정
-    sf::Vector2f newPosition = currentPosition + moveDirection;
-    SetPosition(newPosition);
+    if(isFalling||isJumping)
+    {
+        if((static_cast<int>(collision) & static_cast<int>(CollisionType::RIGHT)||(static_cast<int>(collision) & static_cast<int>(CollisionType::LEFT))))
+        {
+            velocity.x *= -0.5f;
+            currentPosition.x += velocity.x * dt;
+        }
+    } //플레이어의 밑 부분에 충돌이 없다면
+    if(!(static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)))
+    {
+        velocity.y+=gravity*dt;
+        currentPosition.y+=velocity.y*dt;
+        isFalling=true;
+    }
+    else
+    {
+        isFalling=false;
+    }
+    // 플레이어의 위치를 업데이트
+    SetPosition(currentPosition);
 }
 
 void Player::UpdateAnimation() {
@@ -242,7 +247,7 @@ void Player::PerformJump() {
     const float jumpHeight = calculateJumpHeight(chargeDuration, maxJumpHeight);
     isJumping = true;
 
-    velocity.y=-sqrt(gravity*jumpHeight);
+    velocity.y=-sqrt(chargeDuration*jumpHeight*2.f*gravity);
     velocity.x=jumpDirection*moveSpeed*0.5;
 
     sprite.setScale(jumpDirection<0?-1.f:1.f,1.f);
@@ -300,66 +305,3 @@ Player::CollisionType Player::CheckCollision()
     }
     return result;
 }
-
-
-bool Player::CheckGroundCollision()
-{
-    return false;
-}
-
-bool Player::CheckWallCollision()
-{
-    return false;
-}
-
-// int Player::CheckCollisionWithMap()
-// {
-//     sf::FloatRect playerBounds = sprite.getGlobalBounds();
-//     // 플레이어 바운딩 박스의 하단 중앙점에서 시작
-//     int startX = static_cast<int>(playerBounds.left + playerBounds.width / 2);
-//     int startY = static_cast<int>(playerBounds.top + playerBounds.height);
-//
-//     // collisionMap의 높이까지 y 좌표를 증가시키며 검사
-//     for (int y = startY; y < collisionMap.getSize().y; ++y) {
-//         sf::Color pixelColor = collisionMap.getPixel(startX, y);
-//
-//         // 바닥을 나타내는 픽셀을 찾음 (예: Red 또는 Blue)
-//         if (pixelColor == sf::Color::Red || pixelColor == sf::Color::Blue) {
-//             // 찾은 픽셀의 y 좌표 반환
-//             return y;
-//         }
-//     }
-//
-//     // 바닥을 찾지 못한 경우
-//     return -1;
-// }
-
-
-// sf::Vector2f Player::GetGroundCheckPosition()
-// {
-//     sf::FloatRect playerBounds = sprite.getGlobalBounds();
-//     sf::Vector2f groundCheckPosition(playerBounds.left + playerBounds.width / 2, playerBounds.top + playerBounds.height);
-//     return groundCheckPosition;
-// }
-
-
-// bool Player::CheckIfGrounded()
-// {
-//     sf::Vector2f groundCheckPosition=GetGroundCheckPosition();
-//     
-//     bool onGround = true;
-//     return onGround;
-// }
-//
-// sf::Vector2f Player::GetGroundCheckPosition()
-// {
-//     sf::FloatRect playerBounds = sprite.getGlobalBounds();
-//     sf::Vector2f groundCheckPosition(playerBounds.left + playerBounds.width / 2, playerBounds.top + playerBounds.height);
-//
-//     return groundCheckPosition;
-// }
-
-
-
-
-
