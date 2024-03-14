@@ -39,8 +39,9 @@ private:
         ClipInfo()
         = default;
 
-        ClipInfo(const std::string& idle, const std::string& move,const std::string& jump,const std::string& jumpup,const std::string& jumpdown, bool flipX, const sf::Vector2f& point)
-            :idle(idle), move(move), jump(jump),jumpup(jumpup),jumpdown(jumpdown),filpX(flipX), point(point) {}
+        ClipInfo(std::string idle, std::string move, std::string jump, std::string jumpup, std::string jumpdown, bool flipX, const sf::Vector2f& point)
+            :idle(std::move(idle)), move(std::move(move)), jump(std::move(jump)),jumpup(std::move(jumpup)),jumpdown(
+                 std::move(jumpdown)),filpX(flipX), point(point) {}
     };
     
 protected:
@@ -67,11 +68,11 @@ protected:
     bool isGrounded=true;
     bool isFalling=false;
     bool isJumpCharging=false;
-    float gravity = 100.f;
+    float gravity = 300.f;
     float jumpHeightFactor = 100.f;
     float jumpHeight;
     float jumpDirection;
-    float jumpStartTime = 0;
+    float jumpStartTime = 0.f;
     float jumpTime = 0.f;
     float jumpPower = 1000.f;
     float jumpGuage;
@@ -86,7 +87,6 @@ public:
     Player(const std::string& name = "");
 
     void Init() override;
-    void Release() override;
     void Reset() override;
     void Update(float dt) override;
     void LateUpdate(float dt) override;
@@ -99,6 +99,6 @@ public:
     void UpdateAnimation();
     void StartJumpCharging();
     void PerformJump();
-    
     CollisionType CheckCollision();
+    void CorrectYposition(sf::Vector2f& currentPosition, CollisionType collision);
 };
