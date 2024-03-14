@@ -129,11 +129,11 @@ void Player::UpdateMovement(float dt)
 {
     // 충돌 상태 업데이트
     CollisionType collision = CheckCollision();
-    
+
     sf::Vector2f currentPosition = GetPosition();
     float moveDistance = moveSpeed * dt;
     sf::Vector2f moveDirection(0.f, 0.f);
-    
+
     //isGrounded= CheckIfGrounded();
     
     if(isFalling)
@@ -160,31 +160,33 @@ void Player::UpdateMovement(float dt)
         isGrounded = false;
         isJumping = false;
         isFalling = true;
+       
     }
     if(isFalling)
     {
         playerPhase=PlayerPhase::Falling;
-        velocity.y += gravity * dt;
     }
-    
-    bool isBottomCollision = static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM);
-    if(isBottomCollision)
+    // 하강 중에 하단 충돌 확인
+    if (isFalling && (static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)))
     {
-        currentPosition.y -= 5; 
-        SetPosition(sf::Vector2f(currentPosition.x, currentPosition.y)); // 보정된 위치로 설정
-        velocity.y = 0; 
-        isGrounded = true;         
-        playerPhase = PlayerPhase::Grounded;
-        
+        velocity.y = 0;
+        isGrounded = true;
         isFalling = false;
         isJumping = false;
+        playerPhase=PlayerPhase::Grounded;
     }
-    else
-    {                    
-        moveDirection.y += velocity.y * dt;
+    if(!isFalling && (static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)))
+    {
+        velocity.y = 0;
+        isGrounded=true;
+        isFalling=false;
+        isJumping=false;
+        playerPhase=PlayerPhase::Grounded;
     }
-    currentPosition += moveDirection;
-    SetPosition(currentPosition);
+    moveDirection.y += velocity.y * dt;
+    // 이동 및 충돌 처리 후의 새 위치 설정
+    sf::Vector2f newPosition = currentPosition + moveDirection;
+    SetPosition(newPosition);
 }
 
 void Player::UpdateAnimation() {
@@ -240,7 +242,7 @@ void Player::PerformJump() {
     const float jumpHeight = calculateJumpHeight(chargeDuration, maxJumpHeight);
     isJumping = true;
 
-    velocity.y=-sqrt(2*gravity*jumpHeight);
+    velocity.y=-sqrt(gravity*jumpHeight);
     velocity.x=jumpDirection*moveSpeed*0.5;
 
     sprite.setScale(jumpDirection<0?-1.f:1.f,1.f);
