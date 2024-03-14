@@ -26,7 +26,7 @@ public:
         Falling,
         Landing
     };
-    PlayerPhase jumpPhase;
+    PlayerPhase playerPhase;
 private:
     struct ClipInfo
     {
@@ -68,7 +68,7 @@ protected:
     bool isGrounded=true;
     bool isFalling=false;
     bool isJumpCharging=false;
-    float gravity=300.f;
+    float gravity=100.f;
     float jumpHeightFactor=100.f;
     float jumpHeight;
     float jumpDirection;
@@ -105,8 +105,8 @@ public:
     CollisionType CheckCollision();
     static bool CheckGroundCollision();
     static bool CheckWallCollision();
-    void PositionAfterCollision(sf::Vector2f& currentPosition, const sf::Vector2f& moveDirection);
-    bool CheckIfGrounded();
-    sf::Vector2f GetGroundCheckPosition();
-    
+    //int CheckCollisionWithMap();
+    //sf::Vector2f GetGroundCheckPosition();
+    //bool CheckIfGrounded();
+    //sf::Vector2f GetGroundCheckPosition();
 };
