@@ -19,7 +19,6 @@ void GameScene::Init()
     FRAMEWORK.SetTimeScale(1.f);
     background = new SpriteGo("background");
     background->SetTexture("graphics/map1.png");
-    //background->SetOrigin(Origins::MC);
     AddGo(background);
     background2 = new SpriteGo("background2");
     background2->SetTexture("graphics/map2.png");
@@ -145,10 +144,6 @@ void GameScene::FixedUpdate(float dt)
 void GameScene::Draw(sf::RenderWindow& window)
 {
     Scene::Draw(window);
-    //window.draw(map1Sprite);
-    //window.draw(map1Rect);
-    //window.draw(playerRect);
-    
 }
 
 

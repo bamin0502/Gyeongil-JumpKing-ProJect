@@ -19,11 +19,12 @@ public:
     CollisionType collisionType;
     
     enum class PlayerPhase {
-        Grounded,
-        Charging,
-        Rising,
-        Falling,
-        Landing
+        GROUNDED,
+        CHARGING,
+        JUMPING,
+        FALLING,
+        LANDING,
+        BOUNCE,
     };
     PlayerPhase playerPhase;
 private:
@@ -34,14 +35,16 @@ private:
         std::string jump;
         std::string jumpup;
         std::string jumpdown;
+        std::string jumpbounce;
+
+        
         bool filpX=false;
         sf::Vector2f point;
         ClipInfo()
         = default;
-
         ClipInfo(std::string idle, std::string move, std::string jump, std::string jumpup, std::string jumpdown, bool flipX, const sf::Vector2f& point)
             :idle(std::move(idle)), move(std::move(move)), jump(std::move(jump)),jumpup(std::move(jumpup)),jumpdown(
-                 std::move(jumpdown)),filpX(flipX), point(point) {}
+                 std::move(jumpdown)),jumpbounce(jumpbounce),filpX(flipX), point(point) {}
     };
     
 protected:
@@ -59,16 +62,11 @@ protected:
     bool isCollidingTop=false;
     bool isCollidingBottom=false;
     
-    //디버그 및 테스트
-    sf::RectangleShape testRectangle;
-    bool debugMode=false;
-    bool testMode=false;
-    
     float moveSpeed = 100.f;
     bool isGrounded=true;
     bool isFalling=false;
     bool isJumpCharging=false;
-    float gravity = 300.f;
+    float gravity = 200.f;
     float jumpHeightFactor = 100.f;
     float jumpHeight;
     float jumpDirection;
@@ -82,7 +80,8 @@ protected:
     int currentJumpStage;
     float currentHeight;
     float maxJumpHeight = 500.0f;
-
+    float lastPosY;
+    float initialJumpVelocity;
 public:
     Player(const std::string& name = "");
 
@@ -98,7 +97,10 @@ public:
     void UpdateMovement(float dt);
     void UpdateAnimation();
     void StartJumpCharging();
-    void PerformJump();
+    void PerformJump(bool isAutoJump=false);
     CollisionType CheckCollision();
-    void CorrectYposition(sf::Vector2f& currentPosition, CollisionType collision);
+    void CorrectBottomPosition(sf::Vector2f& currentPosition, CollisionType collision);
+    void CorrectRightPosition(sf::Vector2f& currentPosition, CollisionType collision);
+    void CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType collision);
+    void HandleWallBounce();
 };
