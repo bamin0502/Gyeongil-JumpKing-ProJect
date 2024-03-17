@@ -3,7 +3,6 @@
 #include "Animator.h"
 #include "JumpEffect.h"
 
-
 class GameScene;
 
 class Player:public SpriteGo
@@ -37,7 +36,6 @@ private:
         std::string jumpup;
         std::string jumpdown;
         std::string jumpbounce;
-
         
         bool filpX=false;
         sf::Vector2f point;
@@ -57,7 +55,8 @@ protected:
     sf::FloatRect playerBounds;
     sf::FloatRect mapBounds;
     JumpEffect jumpEffect;
-
+    sf::Vector2f jumpStartPos;
+    
     //플레이어 이동을 판정하게할 충돌체크형 Bool문
     bool isCollidingLeft=false;
     bool isCollidingRight=false;
@@ -106,5 +105,5 @@ public:
     void CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void CorrectTopPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void HandleWallBounce();
-    
+    bool IsEdgeInDirection(sf::Keyboard::Key key);
 };

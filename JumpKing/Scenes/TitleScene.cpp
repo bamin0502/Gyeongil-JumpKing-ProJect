@@ -26,6 +26,10 @@ void TitleScene::Init()
     pressStart->SetOrigin(Origins::MC);
     pressStart->SetPosition({0.f, 150.f});
     AddGo(pressStart);
+
+    bgm.openFromFile("sound/mainBgm.wav");
+    bgm.setLoop(true);
+    bgm.play();
     
     for (GameObject* obj : gameObjects)
     {
