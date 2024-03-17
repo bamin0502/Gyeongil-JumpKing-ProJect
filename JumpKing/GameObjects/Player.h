@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "SpriteGo.h"
 #include "Animator.h"
-#include "JumpEffect.h"
 
 class GameScene;
 
@@ -54,7 +53,6 @@ protected:
     sf::Image collisionMap;
     sf::FloatRect playerBounds;
     sf::FloatRect mapBounds;
-    JumpEffect jumpEffect;
     sf::Vector2f jumpStartPos;
     
     //플레이어 이동을 판정하게할 충돌체크형 Bool문
