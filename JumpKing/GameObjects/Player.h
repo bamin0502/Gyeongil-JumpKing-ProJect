@@ -44,7 +44,10 @@ private:
             :idle(std::move(idle)), move(std::move(move)), jump(std::move(jump)),jumpup(std::move(jumpup)),jumpdown(
                  std::move(jumpdown)),jumpbounce(jumpbounce),filpX(flipX), point(point) {}
     };
-    
+    struct CollisionPoint {
+        sf::Vector2f position; // 충돌 포인트의 위치
+        bool isColliding; // 해당 포인트가 충돌했는지 여부
+    };
 protected:
     Animator animator;
     sf::Vector2f velocity;
@@ -81,6 +84,10 @@ protected:
     float maxJumpHeight = 500.0f;
     float lastPosY;
     float initialJumpVelocity;
+
+
+    bool showCollisionPoints = false;
+    std::vector<sf::Vector2f> collisionPoints;
 public:
     Player(const std::string& name = "");
 
@@ -103,5 +110,5 @@ public:
     void CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void CorrectTopPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void HandleWallBounce();
-    bool IsEdgeInDirection(sf::Keyboard::Key key);
+
 };

@@ -65,6 +65,16 @@ void Player::FixedUpdate(float dt) {
 
 void Player::Draw(sf::RenderWindow& window) {
     window.draw(sprite);
+
+    if (showCollisionPoints) {
+        for (const sf::Vector2f& point : collisionPoints) {
+            sf::CircleShape circle(2.f);
+            circle.setFillColor(sf::Color::Red);
+            circle.setOrigin(1.f, 1.f);
+            circle.setPosition(point);
+            window.draw(circle);
+        }
+    }
 }
 
 void Player::SetActive(const bool active)
@@ -78,7 +88,9 @@ void Player::HandleInput(float dt) {
     {
         return;
     }
-    
+    if (InputMgr::GetKeyDown(sf::Keyboard::F1)) {
+        showCollisionPoints = !showCollisionPoints; // F1 키가 눌리면 토글
+    }
     // 자동 점프 체크
     float chargeDuration = timer.getElapsedTime().asSeconds() - jumpStartTime;
     if (isJumpCharging && chargeDuration > 0.6f) {
@@ -114,14 +126,19 @@ void Player::UpdateMovement(float dt)
     sf::Vector2f currentPosition = GetPosition();
     const float moveDistance = this->moveSpeed * dt;
     
-    if(!isGrounded )
+    if(!isGrounded)
     {
         velocity.y+=gravity*dt;
     }
-
-    
-    if (playerPhase == PlayerPhase::GROUNDED) {
-        isGrounded = true;
+    // 추락 상태 로직 개선
+    if (!(static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM))) {
+        // 바닥 충돌이 없고, 점프 상태도 아니라면 추락 상태로 전환
+        if (!isJumping) {
+            playerPhase = PlayerPhase::FALLING;
+        }
+    } 
+    // 점프 중이거나 공중에 있는 동안에는 좌우 이동 제한
+    if (playerPhase != PlayerPhase::JUMPING && playerPhase != PlayerPhase::FALLING && playerPhase != PlayerPhase::BOUNCE && playerPhase != PlayerPhase::CHARGING) {
         if (InputMgr::GetKey(sf::Keyboard::Left)) {
             currentPosition.x -= moveSpeed * dt;
             sprite.setScale(-1.f, 1.f); // 왼쪽을 바라보게 함
@@ -130,19 +147,27 @@ void Player::UpdateMovement(float dt)
             currentPosition.x += moveSpeed * dt;
             sprite.setScale(1.f, 1.f); // 오른쪽을 바라보게 함
         }
+    }
+    if (playerPhase == PlayerPhase::GROUNDED) {
+        isGrounded = true;
+        // if (InputMgr::GetKey(sf::Keyboard::Left)) {
+        //     currentPosition.x -= moveSpeed * dt;
+        //     sprite.setScale(-1.f, 1.f); // 왼쪽을 바라보게 함
+        // }
+        // if (InputMgr::GetKey(sf::Keyboard::Right)) {
+        //     currentPosition.x += moveSpeed * dt;
+        //     sprite.setScale(1.f, 1.f); // 오른쪽을 바라보게 함
+        // }
         if((static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))){
             CorrectLeftPosition(currentPosition,collision);
         }
         if((static_cast<int>(collision)&static_cast<int>(CollisionType::RIGHT))){
             CorrectRightPosition(currentPosition,collision);
         }
-        if(static_cast<int>(collision)&static_cast<int>(CollisionType::BOTTOM))
-        {
-            CorrectBottomPosition(currentPosition,collision);
-        }
+        
     }
     // UpdateMovement 내에서 바닥과의 충돌 처리 부분
-    if(playerPhase ==PlayerPhase::JUMPING)
+    if(playerPhase == PlayerPhase::JUMPING)
     {
         velocity.x =jumpDirection*moveSpeed;
         currentPosition.x += velocity.x * dt;
@@ -168,6 +193,8 @@ void Player::UpdateMovement(float dt)
     {
         velocity.x =jumpDirection*moveSpeed;
         currentPosition.x += velocity.x * dt;
+        isJumping = false;
+        
         if(static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))
         {
             CorrectLeftPosition(currentPosition,collision);
@@ -181,18 +208,20 @@ void Player::UpdateMovement(float dt)
         if(static_cast<int>(collision) & static_cast<int>(CollisionType::BOTTOM)) {
             CorrectBottomPosition(currentPosition, collision);
             playerPhase = PlayerPhase::GROUNDED;
-            // 여기에 velocity.x를 초기화하는 코드 추가
-            velocity.x = 0; // 이동 멈춤
         }
         
     }
 
     if(playerPhase==PlayerPhase::BOUNCE)
     {
-        if(static_cast<int>(collision)&static_cast<int>(CollisionType::BOTTOM))
-        {
-            CorrectBottomPosition(currentPosition,collision);
-            playerPhase=PlayerPhase::GROUNDED;
+        velocity.x =jumpDirection*moveSpeed;
+        currentPosition.x += velocity.x * dt;
+        
+        if (static_cast<int>(collision) & static_cast<int>(CollisionType::LEFT)) {
+            CorrectLeftPosition(currentPosition, collision);
+        }
+        if (static_cast<int>(collision) & static_cast<int>(CollisionType::RIGHT)) {
+            CorrectRightPosition(currentPosition, collision);
         }
         if(static_cast<int>(collision)&static_cast<int>(CollisionType::TOP))
         {
@@ -201,12 +230,10 @@ void Player::UpdateMovement(float dt)
             velocity.y=gravity*dt;
         }
         // 현재 위치를 업데이트합니다.
-        currentPosition.x += velocity.x * dt;
+        //currentPosition.x += velocity.x * dt;
         currentPosition.y += velocity.y * dt;
-        
     }
-
-       
+    
     if (playerPhase == PlayerPhase::CHARGING) {
         if(InputMgr::GetKey(sf::Keyboard::Left))
         {
@@ -220,13 +247,11 @@ void Player::UpdateMovement(float dt)
         {
             jumpDirection=0;
         }
+        isJumping = true;
     }
     
     currentPosition.y += velocity.y * dt;
     SetPosition(currentPosition);
-    
-   
-    
 }
 
 void Player::UpdateAnimation() {
@@ -312,7 +337,7 @@ void Player::PerformJump(bool isAutoJump) {
 
     // 점프 시작 위치 기록
     jumpStartPos = sprite.getPosition();
-    // 점프 중이고 현재 위치가 점프 시작 위치로부터 100 이상 떨어졌는지 확인
+    
     if (playerPhase == PlayerPhase::JUMPING || playerPhase == PlayerPhase::FALLING) {
         if (const float distanceFallen = sprite.getPosition().y - jumpStartPos.y; distanceFallen >= 50.0f) {
             playerPhase = PlayerPhase::LANDING;
@@ -340,7 +365,8 @@ Player::CollisionType Player::CheckCollision()
     isCollidingBottom=false;
     isCollidingLeft=false;
     isCollidingRight=false;
-
+    // 충돌 검사 전 충돌 포인트 목록 초기화
+    collisionPoints.clear();
     const sf::FloatRect playerBounds = sprite.getGlobalBounds();
     float quarterWidth=playerBounds.width/4.f;
 
@@ -355,6 +381,13 @@ Player::CollisionType Player::CheckCollision()
         bottomLeft,
         bottomRight
     };
+    collisionPoints.push_back(points[0]);
+    collisionPoints.push_back(points[1]);
+    collisionPoints.push_back(points[2]);
+    collisionPoints.push_back(points[3]);
+    collisionPoints.push_back(bottomLeft);
+    collisionPoints.push_back(bottomRight);
+    
 
     for (int i = 0; i < 6; ++i) {
         const sf::Vector2f scenePos = gameScene->map1Sprite.getTransform().getInverse().transformPoint(points[i]);
@@ -371,6 +404,7 @@ Player::CollisionType Player::CheckCollision()
                 default: ;
                 }
             }
+           
         }
     }
     CollisionType result = CollisionType::NONE;
@@ -386,6 +420,7 @@ Player::CollisionType Player::CheckCollision()
     if (isCollidingRight) {
         result = static_cast<CollisionType>(static_cast<int>(result) | static_cast<int>(CollisionType::RIGHT));
     }
+    
     return result;
 }
 
@@ -475,27 +510,10 @@ void Player::HandleWallBounce()
         velocity.x = abs(velocity.x) * 1.5f; // 반대 방향으로 더 큰 속도로 반발력
     }
     // 사선으로 튕겨 올라가도록 수직 속도 조정
-    velocity.y = -abs(velocity.y) * 0.75f; // 양수 값으로 설정하여 위로 튕겨나가게 함
+    velocity.y = -abs(velocity.y) * 0.25f; // 양수 값으로 설정하여 위로 튕겨나가게 함
 
     // BOUNCE 상태로 설정
     playerPhase = PlayerPhase::BOUNCE;
-
-  
-}
-
-bool Player::IsEdgeInDirection(sf::Keyboard::Key key)
-{
-    // 플레이어의 현재 위치에서의 충돌 상태를 얻음
-    CollisionType collision = CheckCollision();
-    
-    // 플레이어의 바닥에 충돌이 있고, 왼쪽 또는 오른쪽 방향키가 눌려있는 경우
-    if (isCollidingBottom && (key == sf::Keyboard::Left || key == sf::Keyboard::Right)) {
-        // 왼쪽 또는 오른쪽으로 충돌이 없을 경우, 즉 가장자리에 도달한 경우
-        if ((key == sf::Keyboard::Left && !isCollidingLeft) || (key == sf::Keyboard::Right && !isCollidingRight)) {
-            return true; // 가장자리에 도달함
-        }
-    }
-    return false; // 가장자리가 아님
 }
 
 
