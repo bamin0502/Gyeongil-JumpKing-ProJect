@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SpriteGo.h"
 #include "Animator.h"
+#include "JumpEffect.h"
 
 
 class GameScene;
@@ -55,6 +56,7 @@ protected:
     sf::Image collisionMap;
     sf::FloatRect playerBounds;
     sf::FloatRect mapBounds;
+    JumpEffect jumpEffect;
 
     //플레이어 이동을 판정하게할 충돌체크형 Bool문
     bool isCollidingLeft=false;
@@ -104,4 +106,5 @@ public:
     void CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void CorrectTopPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void HandleWallBounce();
+    
 };

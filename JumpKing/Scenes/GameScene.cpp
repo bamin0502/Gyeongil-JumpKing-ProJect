@@ -3,10 +3,9 @@
 #include "rapidcsv.h"
 #include "Player.h"
 
+
 GameScene::GameScene(const SceneIds id): Scene(id), fadeoutElapsedTime(0), fadeoutDuration(0),
-                                         background(nullptr),
-                                         background2(nullptr),
-                                         background3(nullptr)
+                                         background(nullptr)
 {
 }
 
@@ -18,17 +17,10 @@ void GameScene::Init()
     Scene::Init();
     FRAMEWORK.SetTimeScale(1.f);
     background = new SpriteGo("background");
-    background->SetTexture("graphics/map1.png");
+    background->SetTexture("graphics/map.png");
     AddGo(background);
-    background2 = new SpriteGo("background2");
-    background2->SetTexture("graphics/map2.png");
-    AddGo(background2);
-    background3 = new SpriteGo("background3");
-    background3->SetTexture("graphics/map3.png");
-    AddGo(background3);
     
-
-    map1Texture.loadFromFile("graphics/map1_background.png");
+    map1Texture.loadFromFile("graphics/testmap.png");
     map1PixelTexture.loadFromImage(map1Texture);
     map1Texture=map1PixelTexture.copyToImage();
     map1Sprite.setTexture(map1PixelTexture);
@@ -67,10 +59,8 @@ void GameScene::Enter()
     worldView.setSize(width, height);
     uiView.setSize(windowSize.x, windowSize.y);
    
-    background->SetPosition({-335.f,-2250.f});
+    background->SetPosition({-335.f,-23255.f});
     map1Sprite.setPosition(background->GetPosition());
-    background2->SetPosition({-335.f,-4750.f});
-    background3->SetPosition({-335.f,-7250.f});
    
     uiView.setCenter(960.f, 540.f);
     introText->SetAlpha(255);
@@ -105,9 +95,11 @@ void GameScene::Update(float dt)
             background->SetActive(true);
         }
     }
+    
     const sf::Vector2f playerPosition = player->GetPosition();
     constexpr float viewStep = 500.0f;
-    const float currentViewBottom = worldView.getCenter().y + viewStep / 2; // 현재 뷰의 하단 위치 계산
+    // 현재 뷰의 하단 위치 계산
+    const float currentViewBottom = worldView.getCenter().y + viewStep / 2; 
     
     if(playerPosition.y < worldView.getCenter().y - viewStep / 2) {
         const float newCenterY = worldView.getCenter().y - viewStep;
@@ -117,6 +109,8 @@ void GameScene::Update(float dt)
         const float newCenterY = worldView.getCenter().y + viewStep;
         worldView.setCenter(worldView.getCenter().x, newCenterY);
     }
+
+    
     if(InputMgr::GetKeyDown(sf::Keyboard::Escape))
     {
         //여기다가 일시정지 창을 나오게 하고 일단 게임을 멈추게 하자

@@ -22,11 +22,10 @@ protected:
     sf::Color pixelColor=sf::Color::Red;
 public:
     Player* player=nullptr;
+
     GameScene(SceneIds id);
     ~GameScene() override;
     SpriteGo* background;
-    SpriteGo* background2;
-    SpriteGo* background3;
     sf::Image map1Texture;
     sf::Texture map1PixelTexture;
     sf::Sprite map1Sprite;

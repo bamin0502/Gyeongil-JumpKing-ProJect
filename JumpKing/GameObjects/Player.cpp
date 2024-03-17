@@ -13,7 +13,7 @@ Player::Player(const std::string& name)
 void Player::Init() {
     animator.SetTarget(&sprite);
     SetPosition({0.f, 210.f});
-    playerPhase=PlayerPhase::GROUNDED;
+    playerPhase=PlayerPhase::LANDING;
     lastPosY=position.y;
 }
 
@@ -22,19 +22,25 @@ void Player::Reset() {
     collisionMap = gameScene->map1Sprite.getTexture()->copyToImage();
     animator.Play("animations/player_FallDown.csv");
     SetOrigin(Origins::BC);
-
-    playerPhase = PlayerPhase::GROUNDED;
+    playerPhase = PlayerPhase::LANDING;
 }
 
 void Player::Update(float dt) {
     SpriteGo::Update(dt);
     animator.Update(dt);
-   
     CheckCollision();
     UpdateMovement(dt);
     HandleInput(dt);
-    
-   
+    if (playerPhase == PlayerPhase::GROUNDED) {
+        isGrounded = true;
+    } else {
+        isGrounded = false;
+    }
+    if (playerPhase == PlayerPhase::LANDING) {
+        if (InputMgr::GetKey(sf::Keyboard::Left) || InputMgr::GetKey(sf::Keyboard::Right) || timer.getElapsedTime().asSeconds() > 10.0f) {
+            playerPhase = PlayerPhase::GROUNDED;
+        }
+    }
     // 위치 업데이트 후 추락 체크
     if (position.y > lastPosY) {
         //부딪히지 않았디면
@@ -79,7 +85,7 @@ void Player::HandleInput(float dt) {
         PerformJump(true); // 자동 점프 실행
         isJumpCharging = false;
         playerPhase = PlayerPhase::JUMPING;
-        return; // 점프가 실행되었으므로 이후 입력 처리를 건너뜁니다
+        return; 
     }
     if (playerPhase == PlayerPhase::GROUNDED && InputMgr::GetKeyDown(sf::Keyboard::Space)) {
         StartJumpCharging(); // 점프 차징 시작
@@ -124,6 +130,12 @@ void Player::UpdateMovement(float dt)
         if((static_cast<int>(collision)&static_cast<int>(CollisionType::RIGHT))){
             CorrectRightPosition(currentPosition,collision);
         }
+
+        if(!(static_cast<int>(collision)&static_cast<int>(CollisionType::BOTTOM)))
+        {
+            playerPhase=PlayerPhase::FALLING;
+            velocity.y=gravity*dt;
+        }
     }
     
     
@@ -135,19 +147,19 @@ void Player::UpdateMovement(float dt)
         if(static_cast<int>(collision)&static_cast<int>(CollisionType::TOP))
         {
             CorrectTopPosition(currentPosition,collision);
-            playerPhase=PlayerPhase::FALLING;
+            playerPhase=PlayerPhase::BOUNCE;
         }
-        else if(static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))
+        if(static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))
         {
-            CorrectLeftPosition(currentPosition,collision);
-            playerPhase=PlayerPhase::FALLING;
+            velocity.x=0;
+            HandleWallBounce();
         }
-        else if(static_cast<int>(collision)&static_cast<int>(CollisionType::RIGHT))
+        if(static_cast<int>(collision)&static_cast<int>(CollisionType::RIGHT))
         {
-            CorrectRightPosition(currentPosition,collision);
-            playerPhase=PlayerPhase::FALLING;
+            velocity.x=0;
+            HandleWallBounce();
         }
-
+        
     }
     
     if(playerPhase==PlayerPhase::FALLING)
@@ -160,8 +172,20 @@ void Player::UpdateMovement(float dt)
             CorrectBottomPosition(currentPosition,collision);
             playerPhase=PlayerPhase::GROUNDED;
         }
+        if(static_cast<int>(collision)&static_cast<int>(CollisionType::TOP))
+        {
+            CorrectTopPosition(currentPosition,collision);
+            velocity.y=gravity*dt;
+        }
+        if(static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))
+        {
+            CorrectLeftPosition(currentPosition,collision);
+        }
+        if(static_cast<int>(collision)&static_cast<int>(CollisionType::RIGHT))
+        {
+            CorrectRightPosition(currentPosition,collision);
+        }
         
-       
     }
 
     if(playerPhase==PlayerPhase::BOUNCE)
@@ -171,16 +195,12 @@ void Player::UpdateMovement(float dt)
             CorrectBottomPosition(currentPosition,collision);
             playerPhase=PlayerPhase::GROUNDED;
         }
-        else if(static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))
+        if(static_cast<int>(collision)&static_cast<int>(CollisionType::TOP))
         {
-            CorrectLeftPosition(currentPosition,collision);
-            
+            CorrectTopPosition(currentPosition,collision);
+            velocity.y=gravity*dt;
         }
-        else if(static_cast<int>(collision)&static_cast<int>(CollisionType::RIGHT))
-        {
-            CorrectRightPosition(currentPosition,collision);
-            
-        }
+        
     }
 
        
@@ -210,17 +230,9 @@ void Player::UpdateMovement(float dt)
             HandleWallBounce();
         }
         
-        if(isCollidingTop)
-        {
-            velocity.y = gravity * dt;
-            playerPhase=PlayerPhase::BOUNCE;
-            isJumping=false;
-        }
         velocity.y+=gravity*dt;
     }
     
-    
-  
     
     //currentPosition.x += velocity.x * dt;
     currentPosition.y += velocity.y * dt;
@@ -275,6 +287,7 @@ void Player::UpdateAnimation() {
             animator.Play("animations/player_Bounce.csv");
         }
         break;
+        
     default: ;
     }
 }
@@ -309,7 +322,7 @@ void Player::PerformJump(bool isAutoJump) {
     playerPhase = PlayerPhase::JUMPING;
     
     // 점프 초기 Y축 속도 설정: 높이에 기반한 계산
-    velocity.y = -sqrt(1 * gravity * jumpHeight);
+    velocity.y = -sqrt(0.95 * gravity * jumpHeight);
     // 점프 방향에 따른 X축 속도 설정
     velocity.x = 0.5*jumpDirection * moveSpeed;
 
@@ -415,8 +428,7 @@ void Player::CorrectRightPosition(sf::Vector2f& currentPosition, CollisionType c
     SetPosition(currentPosition);
     playerPhase=PlayerPhase::GROUNDED;
     velocity.x=0;
-    isGrounded=false;
-    isJumping=false;
+
 }
 
 void Player::CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType collision)
@@ -437,9 +449,6 @@ void Player::CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType co
     SetPosition(currentPosition);
     playerPhase=PlayerPhase::GROUNDED;
     velocity.x=0;
-    isGrounded=false;
-    isJumping=false;
-    
 }
 
 void Player::CorrectTopPosition(sf::Vector2f& currentPosition, CollisionType collision)
@@ -459,8 +468,7 @@ void Player::CorrectTopPosition(sf::Vector2f& currentPosition, CollisionType col
     SetPosition(currentPosition);
     playerPhase = PlayerPhase::GROUNDED;
     velocity.y = 0;
-    isGrounded = false;
-    isJumping = false;
+
     
 }
 
