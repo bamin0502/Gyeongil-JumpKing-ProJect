@@ -102,5 +102,6 @@ public:
     void CorrectBottomPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void CorrectRightPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void CorrectLeftPosition(sf::Vector2f& currentPosition, CollisionType collision);
+    void CorrectTopPosition(sf::Vector2f& currentPosition, CollisionType collision);
     void HandleWallBounce();
 };
