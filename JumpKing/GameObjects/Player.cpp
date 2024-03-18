@@ -12,7 +12,7 @@ Player::Player(const std::string& name)
 
 void Player::Init() {
     animator.SetTarget(&sprite);
-    SetPosition({0.f, 208.f});
+    SetPosition({0.f, 210.f});
     playerPhase=PlayerPhase::LANDING;
     lastPosY=position.y;
 }
@@ -68,8 +68,9 @@ void Player::Draw(sf::RenderWindow& window) {
 
     if (showCollisionPoints) {
         for (const sf::Vector2f& point : collisionPoints) {
+            window.draw(gameScene->map1Sprite);
             sf::CircleShape circle(2.f);
-            circle.setFillColor(sf::Color::Red);
+            circle.setFillColor(sf::Color::Black);
             circle.setOrigin(1.f, 1.f);
             circle.setPosition(point);
             window.draw(circle);
@@ -138,7 +139,8 @@ void Player::UpdateMovement(float dt)
         }
     } 
     // 점프 중이거나 공중에 있는 동안에는 좌우 이동 제한
-    if (playerPhase != PlayerPhase::JUMPING && playerPhase != PlayerPhase::FALLING && playerPhase != PlayerPhase::BOUNCE && playerPhase != PlayerPhase::CHARGING) {
+    if (playerPhase != PlayerPhase::JUMPING && playerPhase != PlayerPhase::FALLING &&
+        playerPhase != PlayerPhase::BOUNCE && playerPhase != PlayerPhase::CHARGING) {
         if (InputMgr::GetKey(sf::Keyboard::Left)) {
             currentPosition.x -= moveSpeed * dt;
             sprite.setScale(-1.f, 1.f); // 왼쪽을 바라보게 함
@@ -150,14 +152,6 @@ void Player::UpdateMovement(float dt)
     }
     if (playerPhase == PlayerPhase::GROUNDED) {
         isGrounded = true;
-        // if (InputMgr::GetKey(sf::Keyboard::Left)) {
-        //     currentPosition.x -= moveSpeed * dt;
-        //     sprite.setScale(-1.f, 1.f); // 왼쪽을 바라보게 함
-        // }
-        // if (InputMgr::GetKey(sf::Keyboard::Right)) {
-        //     currentPosition.x += moveSpeed * dt;
-        //     sprite.setScale(1.f, 1.f); // 오른쪽을 바라보게 함
-        // }
         if((static_cast<int>(collision)&static_cast<int>(CollisionType::LEFT))){
             CorrectLeftPosition(currentPosition,collision);
         }

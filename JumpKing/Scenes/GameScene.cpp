@@ -17,10 +17,16 @@ void GameScene::Init()
     Scene::Init();
     FRAMEWORK.SetTimeScale(1.f);
     background = new SpriteGo("background");
-    background->SetTexture("graphics/map.png");
+    background->SetTexture("graphics/map1.png");
     AddGo(background);
+    background2= new SpriteGo("background2");
+    background2->SetTexture("graphics/map2.png");
+    AddGo(background2);
+    background3= new SpriteGo("background3");
+    background3->SetTexture("graphics/map3.png");
+    AddGo(background3);
     
-    map1Texture.loadFromFile("graphics/testmap.png");
+    map1Texture.loadFromFile("graphics/map1_background.png");
     map1PixelTexture.loadFromImage(map1Texture);
     map1Texture=map1PixelTexture.copyToImage();
     map1Sprite.setTexture(map1PixelTexture);
@@ -59,7 +65,9 @@ void GameScene::Enter()
     worldView.setSize(width, height);
     uiView.setSize(windowSize.x, windowSize.y);
    
-    background->SetPosition({-335.f,-23255.f});
+    background->SetPosition({-335.f,-2250.f});
+    background2->SetPosition({-335.f,-4750.f});
+    background3->SetPosition({-335.f,-7250.f});
     map1Sprite.setPosition(background->GetPosition());
    
     uiView.setCenter(960.f, 540.f);
