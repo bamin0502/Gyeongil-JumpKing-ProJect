@@ -1,0 +1,9 @@
+ID,FPS,"LOOPTYPE (0:Single , 1:Loop , 2:PingPong)",,
+jumpEffect,5,1,,
+,,,,
+TEXTURE ID,LEFT,TOP,WIDTH,HEIGHT
+graphics/jump_particle.png,0,0,32,32
+graphics/jump_particle.png,32,0,32,32
+graphics/jump_particle.png,64,0,32,32
+graphics/jump_particle.png,96,0,32,32
+graphics/jump_particle.png,128,0,32,32

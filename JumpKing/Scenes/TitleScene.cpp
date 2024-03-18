@@ -4,7 +4,8 @@
 #include "TextGo.h"
 
 
-TitleScene::TitleScene(SceneIds id):Scene(id)
+TitleScene::TitleScene(SceneIds id): Scene(id), TitleImage(nullptr), pressStart(nullptr), fadeInElapsedTime(0),
+                                     fadeInDuration(0)
 {
 }
 
@@ -26,6 +27,11 @@ void TitleScene::Init()
     pressStart->SetOrigin(Origins::MC);
     pressStart->SetPosition({0.f, 150.f});
     AddGo(pressStart);
+
+    bgm.openFromFile("sound/mainBgm.wav");
+    bgm.setLoop(true);
+    bgm.setVolume(50);
+    bgm.play();
     
     for (GameObject* obj : gameObjects)
     {
@@ -36,6 +42,7 @@ void TitleScene::Init()
 void TitleScene::Release()
 {
     Scene::Release();
+    
 }
 
 void TitleScene::Enter()
@@ -53,6 +60,7 @@ void TitleScene::Enter()
 void TitleScene::Exit()
 {
     Scene::Exit();
+    bgm.stop();
 }
 
 void TitleScene::Update(float dt)
@@ -61,7 +69,7 @@ void TitleScene::Update(float dt)
     if(isFadingIn)
     {
         fadeInElapsedTime += dt;
-        float alpha = (fadeInElapsedTime / fadeInDuration) * 255;
+        const float alpha = (fadeInElapsedTime / fadeInDuration) * 255;
         TitleImage->SetAlpha(alpha);
 
         if (fadeInElapsedTime >= fadeInDuration) {

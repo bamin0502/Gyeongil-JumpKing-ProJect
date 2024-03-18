@@ -12,7 +12,7 @@ protected:
     std::wstring str= L"Space 버튼을 누르세요";
     float fadeInElapsedTime;
     float fadeInDuration;
-
+    sf::Music bgm;
     bool isFadingIn=false;
 public:
     TitleScene(SceneIds id);
